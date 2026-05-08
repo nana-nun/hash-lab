@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import csv
+import json
 import math
 import random
 from dataclasses import dataclass
+from pathlib import Path
 
 from .mini_sha import digest, digest_bits
 
@@ -139,26 +142,106 @@ def add_common_rounds(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--rounds", nargs="+", type=int, required=True)
     parser.add_argument("--samples", type=int, default=500)
     parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument("--output", type=Path, help="Save results to this CSV or JSON path")
+    parser.add_argument("--format", choices=("csv", "json"), default="csv", help="Output file format")
+
+
+def write_rows_csv(path: Path, fieldnames: list[str], rows: list[dict[str, object]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def write_results_json(path: Path, metadata: dict[str, object], rows: list[dict[str, object]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"metadata": metadata, "results": rows}
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
+def save_results(
+    args: argparse.Namespace,
+    metadata: dict[str, object],
+    fieldnames: list[str],
+    rows: list[dict[str, object]],
+) -> None:
+    if args.output is None:
+        return
+
+    if args.format == "csv":
+        write_rows_csv(args.output, fieldnames, rows)
+        return
+
+    write_results_json(args.output, metadata, rows)
 
 
 def run_avalanche(args: argparse.Namespace) -> None:
     print("rounds,samples,mean,stdev,min,max")
+    rows: list[dict[str, object]] = []
     for rounds in args.rounds:
         result = avalanche(rounds, samples=args.samples, seed=args.seed)
+        rows.append(
+            {
+                "experiment": "avalanche",
+                "seed": args.seed,
+                "rounds": result.rounds,
+                "samples": result.samples,
+                "mean": round(result.mean, 4),
+                "stdev": round(result.stdev, 4),
+                "min": round(result.minimum, 4),
+                "max": round(result.maximum, 4),
+            }
+        )
         print(
             f"{result.rounds},{result.samples},"
             f"{result.mean:.4f},{result.stdev:.4f},{result.minimum:.4f},{result.maximum:.4f}"
         )
+    save_results(
+        args,
+        {
+            "experiment": "avalanche",
+            "seed": args.seed,
+            "rounds": args.rounds,
+            "samples": args.samples,
+        },
+        ["experiment", "seed", "rounds", "samples", "mean", "stdev", "min", "max"],
+        rows,
+    )
 
 
 def run_distinguish(args: argparse.Namespace) -> None:
     print("rounds,samples,epochs,train_accuracy,test_accuracy")
+    rows: list[dict[str, object]] = []
     for rounds in args.rounds:
         result = distinguish(rounds, samples=args.samples, epochs=args.epochs, seed=args.seed)
+        rows.append(
+            {
+                "experiment": "distinguish",
+                "seed": args.seed,
+                "rounds": result.rounds,
+                "samples": result.samples,
+                "epochs": result.epochs,
+                "train_accuracy": round(result.train_accuracy, 4),
+                "test_accuracy": round(result.test_accuracy, 4),
+            }
+        )
         print(
             f"{result.rounds},{result.samples},{result.epochs},"
             f"{result.train_accuracy:.4f},{result.test_accuracy:.4f}"
         )
+    save_results(
+        args,
+        {
+            "experiment": "distinguish",
+            "seed": args.seed,
+            "rounds": args.rounds,
+            "samples": args.samples,
+            "epochs": args.epochs,
+        },
+        ["experiment", "seed", "rounds", "samples", "epochs", "train_accuracy", "test_accuracy"],
+        rows,
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:

@@ -18,6 +18,15 @@ python -m src.hash_lab.cli distinguish --rounds 2 4 8 16 --samples 1000 --epochs
 python -m unittest discover -s tests
 ```
 
+実験結果を `results/` 配下に保存する例:
+
+```powershell
+python -m src.hash_lab.cli avalanche --rounds 2 4 8 16 32 --samples 500 --seed 1 --output results/avalanche.csv --format csv
+python -m src.hash_lab.cli distinguish --rounds 2 4 8 16 --samples 1000 --epochs 8 --seed 1 --output results/distinguish.json --format json
+```
+
+`--output` を指定しない場合は、従来どおり標準出力だけに結果を表示します。保存するCSVには `experiment`、`seed`、`rounds`、`samples` などの実行条件を含めます。JSONは `metadata` と `results` に分けて保存します。
+
 ## Working Rules
 
 このリポジトリで作業するときの一次参照は `AGENTS.md` です。Repo内Skillは `.agents/skills/hash-lab-research/` にあります。
