@@ -31,6 +31,9 @@
 ## Documentation
 
 - 研究メモ、設計メモ、実験メモは基本的に Markdown (`.md`) で書く。
+- 人間が読む文書は日本語で書く。例: `README.md`、`docs/`、`references/`、`results/*/notes.md`。
+- AIエージェントが読む文書は英語で書く。例: `.agents/` 配下のワークフロー、スキル、ポリシー。
+- 人間向け文書にコマンド名、列名、API名、セクション名などの技術的な識別子を書く場合は、英語のまま残してよい。
 - 主張、仮説、結果を混ぜない。研究メモでは、できるだけ `Question`、`Hypothesis`、`Setup`、`Result`、`Interpretation`、`Limitations`、`Next` を分ける。
 - 参考文献を追加するときは、URL、書籍名、論文題、著者、年、DOI が分かる範囲で必ず残す。
 - BibTeXで管理できる文献は `references/papers.bib` に追加する。
