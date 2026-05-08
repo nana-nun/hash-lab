@@ -1,0 +1,95 @@
+# hash-lab Agent Guide
+
+このファイルは、hash-lab でAIエージェントが作業するときの一次参照です。迷ったら、まずこの方針を優先してください。
+
+## Research Goal
+
+このリポジトリの目的は「SHA256を破る」ことではありません。
+
+目的は、toy hash や reduced-round SHA-like hash を使って、暗号学的ハッシュ関数がどこまで学習不能になるかを調べることです。
+
+## Research Scope
+
+対象にするもの:
+
+- toy hash
+- reduced-round SHA-like hash
+- avalanche effect の測定
+- neural distinguisher
+- brute force baseline
+- SAT/SMT による小規模探索
+- Grover風探索のシミュレーション
+
+対象外にするもの:
+
+- 実在ネットワークへのマイニング最適化
+- ウォレット、秘密鍵、署名の攻撃
+- 実マイニングプールへの接続
+- 実運用中システムへの攻撃手順
+- 不正利用につながる具体的な攻撃手順
+
+## Documentation
+
+- 研究メモ、設計メモ、実験メモは基本的に Markdown (`.md`) で書く。
+- 主張、仮説、結果を混ぜない。研究メモでは、できるだけ `Question`、`Hypothesis`、`Setup`、`Result`、`Interpretation`、`Limitations`、`Next` を分ける。
+- 参考文献を追加するときは、URL、書籍名、論文題、著者、年、DOI が分かる範囲で必ず残す。
+- BibTeXで管理できる文献は `references/papers.bib` に追加する。
+- Web記事やリンク集は `references/links.md` に追加する。
+- 読書メモは `references/notes/` に Markdown で作成する。
+
+## Experiment Principle
+
+AIモデルを使う前に、必ず単純なベースラインを用意する。
+
+例:
+
+- random guess
+- brute force
+- frequency analysis
+- simple statistical test
+- logistic regression / small MLP
+
+AIモデルの精度だけでなく、ベースラインとの差分を記録する。
+
+## Reproducibility
+
+実験結果を保存する場合は、可能な範囲で以下を残す。
+
+- 実行コマンド
+- seed
+- 対象hash / round数
+- dataset size
+- model config
+- metrics
+- 実行日時
+
+結果を保存する場合は、`results/` 配下に実験ごとのディレクトリを作る。
+
+```text
+results/
+  2026-05-08-avalanche-mini-sha/
+    config.json
+    metrics.json
+    notes.md
+```
+
+## Python
+
+- Pythonを動かす場合は、プロジェクト直下の `.venv` を使う。
+- `.venv` がない場合は作成してから使う。
+- 依存パッケージを追加するときは、理由と用途をREADMEまたは関連ドキュメントに残す。
+
+PowerShell例:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m unittest discover -s tests
+```
+
+## Change Policy
+
+- 既存構成を尊重し、小さく検証可能な実験として追加する。
+- 実験コードは、まず標準ライブラリまたは軽い依存で始める。
+- 実装後は、該当するテストまたはCLIサンプルを実行する。
+- 実験結果を解釈するときは、限界と未確認事項を明記する。
