@@ -81,6 +81,12 @@ results/
 - タスク管理は GitHub Issue を基本にする。
 - 人間向けの運用は `docs/issue-workflow-human.md` を参照する。
 - AI向けの運用は `.agents/issue-workflow-ai.md` を参照する。
+- AIエージェントが GitHub CLI を使う場合は、フルパスではなく `gh ...` 形式で実行する。
+- よく使うコマンド例:
+  - `gh issue list --repo nana-nun/hash-lab --state open --limit 20`
+  - `gh issue view <number> --repo nana-nun/hash-lab`
+  - `gh issue create --repo nana-nun/hash-lab --title "<title>" --label "t:exp" --body "<body>"`
+  - `gh pr create --repo nana-nun/hash-lab --base master --head <branch> --title "<title>" --body "<body>"`
 - Issueは `t:exp`、`t:ref`、`t:impl`、`t:docs`、`t:maint` のいずれかを基本分類にする。
 - 実装前に関連Issueを確認し、完了後にテスト結果、実験結果、制限、残課題をIssueまたは最終応答に残す。
 - scope外の攻撃的タスクはIssue化しない。既にある場合も進めず、研究範囲内の安全な代替に分解する。
