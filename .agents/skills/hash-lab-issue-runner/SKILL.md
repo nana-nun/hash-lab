@@ -11,17 +11,23 @@ Use this skill for one GitHub Issue at a time in the `hash-lab` repository.
 
 1. Read `AGENTS.md`, `.agents/issue-workflow-ai.md`, and any relevant task-specific skill.
 2. Inspect the target GitHub Issue with `gh issue view <number>` and confirm the goal, tasks, acceptance criteria, references, and labels.
-3. Confirm the Issue stays within hash-lab scope: toy hash, reduced-round SHA-like hash, avalanche measurement, local baselines, small simulations, references, docs, or maintenance.
-4. Do not proceed with wallet, private key, signature, live network, mining pool, production system, or misuse-enabling tasks.
-5. Check `git status --short --branch` before edits and preserve unrelated user changes.
-6. Create a dedicated branch named `issue-<number>-<short-slug>`.
-7. Use the project `.venv` for Python commands. Create it only if missing.
-8. Make the smallest change that satisfies the Issue. For experiments, record command, seed, hash/rounds, dataset size, metrics, timestamp when useful, interpretation, limitations, and next steps.
-9. Save experiment outputs under `results/<date>-<short-name>/` when the Issue asks for saved results.
-10. Run the relevant tests or CLI sample before finishing.
-11. Review `Limitations` and `Next` in any new or updated result notes. If a concrete follow-up is needed, create a separate GitHub Issue before finishing instead of hiding the work in the PR text.
-12. Commit the changes, push the branch, and create a PR with `gh pr create`.
-13. Include the Issue closing keyword, changed files summary, verification commands, results, limitations, created follow-up Issues, and remaining follow-ups in the PR body or final response.
+3. Identify exactly one primary `t:*` label and read the matching label skill:
+   - `t:exp`: `hash-lab-exp-issue`
+   - `t:ref`: `hash-lab-ref-issue`
+   - `t:impl`: `hash-lab-impl-issue`
+   - `t:docs`: `hash-lab-docs-issue`
+   - `t:maint`: `hash-lab-maint-issue`
+4. Treat `p:*` and `s:*` labels as scheduling and readiness signals, not separate workflows.
+5. Confirm the Issue stays within hash-lab scope: toy hash, reduced-round SHA-like hash, avalanche measurement, local baselines, small simulations, references, docs, or maintenance.
+6. Do not proceed with wallet, private key, signature, live network, mining pool, production system, or misuse-enabling tasks.
+7. Check `git status --short --branch` before edits and preserve unrelated user changes.
+8. Create a dedicated branch named `issue-<number>-<short-slug>`.
+9. Use the project `.venv` for Python commands. Create it only if missing.
+10. Make the smallest change that satisfies the Issue, using the label skill for output placement and verification details.
+11. Run the relevant tests, validation command, or CLI sample before finishing.
+12. Review any `Limitations` and `Next` notes. If a concrete follow-up is needed, create a separate GitHub Issue before finishing instead of hiding the work in the PR text.
+13. Commit the changes, push the branch, and create a PR with `gh pr create`.
+14. Include the Issue closing keyword, changed files summary, verification commands, results, limitations, created follow-up Issues, and remaining follow-ups in the PR body or final response.
 
 ## Experiment Notes
 
@@ -37,6 +43,18 @@ Use `docs/experiment-log-template.md` as the default structure:
 - `Next`
 
 Keep claims, hypotheses, and results separate.
+
+## Label Skills
+
+Use the primary `t:*` label to load the task-specific guide:
+
+| Label | Skill | Use for |
+| --- | --- | --- |
+| `t:exp` | `hash-lab-exp-issue` | experiments, measurements, metrics, saved results |
+| `t:ref` | `hash-lab-ref-issue` | papers, links, BibTeX, reading notes |
+| `t:impl` | `hash-lab-impl-issue` | code, CLI behavior, tests, refactors |
+| `t:docs` | `hash-lab-docs-issue` | README, docs, Japanese research notes |
+| `t:maint` | `hash-lab-maint-issue` | environment, CI, repo hygiene, skills |
 
 ## PR Checklist
 
