@@ -89,3 +89,17 @@ For reference Issues, capture URL, book title, paper title, authors, year, DOI, 
 - Update `references/` for literature tasks.
 - Run the relevant test or CLI sample before finishing.
 - Report changed files, verification, and remaining limitations in the Issue or final response.
+
+## Label Skills
+
+When implementing an Issue, use `hash-lab-issue-runner` for the common workflow and then read the skill that matches the primary `t:*` label.
+
+| Label | Skill | Focus |
+| --- | --- | --- |
+| `t:exp` | `hash-lab-exp-issue` | 実験設計、baseline、metrics、`results/`、再現性 |
+| `t:ref` | `hash-lab-ref-issue` | 文献、リンク、BibTeX、読書メモ、出典確認 |
+| `t:impl` | `hash-lab-impl-issue` | コード変更、CLI/API互換性、テスト、最小変更 |
+| `t:docs` | `hash-lab-docs-issue` | README、docs、人間向け日本語Markdown、研究メモ |
+| `t:maint` | `hash-lab-maint-issue` | 環境、CI、依存、リポジトリ整理、Skill整備 |
+
+Use `p:*` labels for priority and `s:*` labels for readiness/research state. Do not treat them as separate implementation workflows.
