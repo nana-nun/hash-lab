@@ -1,0 +1,43 @@
+name: Documentation
+description: README、docs、研究メモ
+title: "[docs] "
+labels: ["t:docs", "s:ready"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: どの文書をどう改善するか
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: 背景、読者、関連ファイル
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      value: |
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      value: |
+        - [ ] Markdownとして読める
+        - [ ] 主張、仮説、結果が区別されている
+        - [ ] 必要な参考文献やリンクが残っている
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: 関連Issue、文献、既存メモ

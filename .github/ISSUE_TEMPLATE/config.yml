@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: hash-lab working rules
+    url: https://github.com/nana-nun/hash-lab/blob/master/AGENTS.md
+    about: 作業方針と研究スコープを確認する

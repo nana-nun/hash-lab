@@ -1,0 +1,43 @@
+name: Implementation
+description: コード生成、機能追加、リファクタ
+title: "[impl] "
+labels: ["t:impl", "s:ready"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: 実装で達成すること
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: 関連ファイル、既存挙動、制約
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      value: |
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      value: |
+        - [ ] 実装が完了している
+        - [ ] 関連テストまたはCLIサンプルが通っている
+        - [ ] 制限や未確認事項が記録されている
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: 関連Issue、文献、設計メモ、コードへのリンク

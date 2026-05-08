@@ -1,0 +1,43 @@
+name: Maintenance
+description: 環境、CI、整理、運用
+title: "[maint] "
+labels: ["t:maint", "s:ready"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: 整備したいこと
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: 背景、困っていること、関連ファイル
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      value: |
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      value: |
+        - [ ] 運用や環境が改善されている
+        - [ ] 必要な確認コマンドが実行されている
+        - [ ] 変更理由が記録されている
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: 関連Issue、ドキュメント、ログ

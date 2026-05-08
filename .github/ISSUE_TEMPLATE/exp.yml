@@ -1,0 +1,79 @@
+name: Experiment
+description: 実験、測定、評価タスク
+title: "[exp] "
+labels: ["t:exp", "s:ready"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        実験は toy / reduced-round / 小規模シミュレーションに限定します。AIモデルを使う前に baseline を用意してください。
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: この実験で何を明らかにするか
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: 背景、関連ファイル、前提
+    validations:
+      required: true
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis
+      description: 実験前の仮説
+    validations:
+      required: true
+  - type: textarea
+    id: baseline
+    attributes:
+      label: Baseline
+      description: random guess、brute force、統計テストなど
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      value: |
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Metrics
+      description: accuracy、flip ratio、runtimeなど
+    validations:
+      required: true
+  - type: textarea
+    id: reproducibility
+    attributes:
+      label: Reproducibility
+      value: |
+        - Command:
+        - Seed:
+        - Hash / rounds:
+        - Dataset size:
+        - Model config:
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      value: |
+        - [ ] 結果と制限が記録されている
+        - [ ] 必要なテストまたはCLIサンプルが実行されている
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: 関連Issue、文献、メモ、コードへのリンク

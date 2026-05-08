@@ -1,0 +1,56 @@
+name: Reference
+description: 文献、リンク、読書メモの収集タスク
+title: "[ref] "
+labels: ["t:ref", "s:research"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: 何を集めるか、何を判断できるようにするか
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: 背景、関連テーマ、調査範囲
+    validations:
+      required: true
+  - type: textarea
+    id: source_info
+    attributes:
+      label: Source Info
+      value: |
+        - URL:
+        - Book title:
+        - Paper title:
+        - Authors:
+        - Year:
+        - DOI:
+        - BibTeX:
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      value: |
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      value: |
+        - [ ] `references/papers.bib`、`references/links.md`、または `references/notes/` が更新されている
+        - [ ] hash-labとの関係が短く説明されている
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: 関連Issueや既存メモ

@@ -13,7 +13,8 @@ description: Use when working in the hash-lab repository on reduced-round hash e
 4. Use `.venv` before running Python commands.
 5. Add a simple baseline before AI/neural experiments.
 6. Record commands, seed, config, metrics, and limitations when saving results.
-7. Run the relevant test or CLI sample after implementation.
+7. For Issue-driven tasks, read `docs/issue-workflow-human.md` and `.agents/issue-workflow-ai.md`.
+8. Run the relevant test or CLI sample after implementation.
 
 ## Research Notes
 
@@ -29,6 +30,18 @@ When writing experiment notes, separate:
 - `Next`
 
 Use `docs/experiment-log-template.md` as the default template.
+
+## Issue Workflow
+
+Use GitHub Issues for experiments, references, implementation, documentation, and maintenance. Prefer short labels:
+
+- `t:exp`
+- `t:ref`
+- `t:impl`
+- `t:docs`
+- `t:maint`
+
+Before implementing an Issue, confirm its goal, acceptance criteria, scope, and safety boundary. After implementation, report verification results and remaining limitations.
 
 ## Safety Boundary
 

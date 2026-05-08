@@ -73,6 +73,15 @@ results/
     notes.md
 ```
 
+## Issue Workflow
+
+- タスク管理は GitHub Issue を基本にする。
+- 人間向けの運用は `docs/issue-workflow-human.md` を参照する。
+- AI向けの運用は `.agents/issue-workflow-ai.md` を参照する。
+- Issueは `t:exp`、`t:ref`、`t:impl`、`t:docs`、`t:maint` のいずれかを基本分類にする。
+- 実装前に関連Issueを確認し、完了後にテスト結果、実験結果、制限、残課題をIssueまたは最終応答に残す。
+- scope外の攻撃的タスクはIssue化しない。既にある場合も進めず、研究範囲内の安全な代替に分解する。
+
 ## Python
 
 - Pythonを動かす場合は、プロジェクト直下の `.venv` を使う。
