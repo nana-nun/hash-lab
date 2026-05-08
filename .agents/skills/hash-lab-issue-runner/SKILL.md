@@ -19,8 +19,9 @@ Use this skill for one GitHub Issue at a time in the `hash-lab` repository.
 8. Make the smallest change that satisfies the Issue. For experiments, record command, seed, hash/rounds, dataset size, metrics, timestamp when useful, interpretation, limitations, and next steps.
 9. Save experiment outputs under `results/<date>-<short-name>/` when the Issue asks for saved results.
 10. Run the relevant tests or CLI sample before finishing.
-11. Commit the changes, push the branch, and create a PR with `gh pr create`.
-12. Include the Issue closing keyword, changed files summary, verification commands, results, limitations, and remaining follow-ups in the PR body or final response.
+11. Review `Limitations` and `Next` in any new or updated result notes. If a concrete follow-up is needed, create a separate GitHub Issue before finishing instead of hiding the work in the PR text.
+12. Commit the changes, push the branch, and create a PR with `gh pr create`.
+13. Include the Issue closing keyword, changed files summary, verification commands, results, limitations, created follow-up Issues, and remaining follow-ups in the PR body or final response.
 
 ## Experiment Notes
 
@@ -43,4 +44,14 @@ Keep claims, hypotheses, and results separate.
 - Mention the branch name.
 - List the exact verification command and result.
 - For experiments, mention where the result files are stored.
+- Mention any follow-up Issues created from the result interpretation.
 - State limitations plainly instead of overstating the result.
+
+## Follow-up Issue Checklist
+
+- Create follow-up Issues from concrete `Limitations` or `Next` items when they are actionable and not already covered by an open Issue.
+- Keep follow-up Issues inside the hash-lab safety scope.
+- Use a human-readable Japanese Issue body for GitHub Issues.
+- Include `Goal`, `Context`, `Tasks`, `Acceptance Criteria`, and `References`.
+- For experiment follow-ups, also include `Hypothesis`, `Baseline`, `Metrics`, and `Reproducibility`.
+- Link the source Issue, result directory, metrics file, and notes file when available.
