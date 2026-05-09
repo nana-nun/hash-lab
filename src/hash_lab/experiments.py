@@ -28,8 +28,11 @@ class DistinguishResult:
     rounds: int
     samples: int
     epochs: int
+    random_guess_baseline: float
+    majority_baseline: float
     train_accuracy: float
     test_accuracy: float
+    test_accuracy_minus_baseline: float
 
 
 def hamming_distance(left: bytes, right: bytes) -> int:
@@ -123,18 +126,29 @@ def accuracy(rows: list[tuple[list[int], int]], weights: list[float], bias: floa
     return correct / len(rows)
 
 
+def majority_baseline_accuracy(rows: list[tuple[list[int], int]]) -> float:
+    positives = sum(label for _, label in rows)
+    negatives = len(rows) - positives
+    return max(positives, negatives) / len(rows)
+
+
 def distinguish(rounds: int, samples: int, epochs: int, seed: int = 1) -> DistinguishResult:
     rows = make_distinguish_dataset(rounds, samples=samples, seed=seed)
     split = int(len(rows) * 0.8)
     train_rows = rows[:split]
     test_rows = rows[split:]
     weights, bias = train_logistic(train_rows, epochs=epochs)
+    random_guess_baseline = 0.5
+    test_accuracy = accuracy(test_rows, weights, bias)
     return DistinguishResult(
         rounds=rounds,
         samples=samples,
         epochs=epochs,
+        random_guess_baseline=random_guess_baseline,
+        majority_baseline=majority_baseline_accuracy(test_rows),
         train_accuracy=accuracy(train_rows, weights, bias),
-        test_accuracy=accuracy(test_rows, weights, bias),
+        test_accuracy=test_accuracy,
+        test_accuracy_minus_baseline=test_accuracy - random_guess_baseline,
     )
 
 
@@ -211,7 +225,10 @@ def run_avalanche(args: argparse.Namespace) -> None:
 
 
 def run_distinguish(args: argparse.Namespace) -> None:
-    print("rounds,samples,epochs,train_accuracy,test_accuracy")
+    print(
+        "rounds,samples,epochs,random_guess_baseline,majority_baseline,"
+        "train_accuracy,test_accuracy,test_accuracy_minus_baseline"
+    )
     rows: list[dict[str, object]] = []
     for rounds in args.rounds:
         result = distinguish(rounds, samples=args.samples, epochs=args.epochs, seed=args.seed)
@@ -222,13 +239,18 @@ def run_distinguish(args: argparse.Namespace) -> None:
                 "rounds": result.rounds,
                 "samples": result.samples,
                 "epochs": result.epochs,
+                "random_guess_baseline": round(result.random_guess_baseline, 4),
+                "majority_baseline": round(result.majority_baseline, 4),
                 "train_accuracy": round(result.train_accuracy, 4),
                 "test_accuracy": round(result.test_accuracy, 4),
+                "test_accuracy_minus_baseline": round(result.test_accuracy_minus_baseline, 4),
             }
         )
         print(
             f"{result.rounds},{result.samples},{result.epochs},"
-            f"{result.train_accuracy:.4f},{result.test_accuracy:.4f}"
+            f"{result.random_guess_baseline:.4f},{result.majority_baseline:.4f},"
+            f"{result.train_accuracy:.4f},{result.test_accuracy:.4f},"
+            f"{result.test_accuracy_minus_baseline:.4f}"
         )
     save_results(
         args,
@@ -238,8 +260,20 @@ def run_distinguish(args: argparse.Namespace) -> None:
             "rounds": args.rounds,
             "samples": args.samples,
             "epochs": args.epochs,
+            "random_guess_baseline": 0.5,
         },
-        ["experiment", "seed", "rounds", "samples", "epochs", "train_accuracy", "test_accuracy"],
+        [
+            "experiment",
+            "seed",
+            "rounds",
+            "samples",
+            "epochs",
+            "random_guess_baseline",
+            "majority_baseline",
+            "train_accuracy",
+            "test_accuracy",
+            "test_accuracy_minus_baseline",
+        ],
         rows,
     )
 
