@@ -35,3 +35,12 @@
 ## Scope
 
 この研究では、実システムへの攻撃手順ではなく、縮小ラウンド・toy hash・機械学習による識別実験・暗号学的性質の理解に関係する文献を優先します。
+
+## Priority for Individual Notes
+
+`notes/` の個別メモは、次の順で優先します。
+
+- 現在の実験解釈に直接関係する主軸文献。例: avalanche / SAC、reduced-round SHA-like analysis、neural distinguisher。
+- `reading-list.md` で同じ分野の基準点になる文献。例: Webster/Tavares、Forré、Gohr、Benamira et al.
+- 実験項目や baseline を増やす判断に使う文献。例: SAC、BIC、randomness tests、low-order statistics。
+- 背景理解には重要だが hash-lab の実験に直接つながらない文献は、まず `reading-list.md` の短い説明に留めます。
