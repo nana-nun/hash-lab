@@ -1,0 +1,26 @@
+{
+  "experiment": "distinguish",
+  "issue": 2,
+  "command": ".\\.venv\\Scripts\\python.exe -m src.hash_lab.cli distinguish --rounds 2 4 8 16 --samples 1000 --epochs 8 --seed 1 --output results\\2026-05-09-distinguish-baseline\\metrics.csv --format csv",
+  "executed_at": "2026-05-09T19:27:38+09:00",
+  "seed": 1,
+  "hash": "mini-sha",
+  "rounds": [2, 4, 8, 16],
+  "dataset_size": {
+    "samples_per_class": 1000,
+    "total_rows": 2000,
+    "train_fraction": 0.8,
+    "test_fraction": 0.2
+  },
+  "model_config": {
+    "model": "logistic regression",
+    "epochs": 8,
+    "learning_rate": 0.08,
+    "features": 256
+  },
+  "baselines": {
+    "random_guess_accuracy": 0.5,
+    "majority_baseline": "computed from each shuffled test split"
+  },
+  "metrics_file": "metrics.csv"
+}

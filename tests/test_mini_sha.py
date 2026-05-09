@@ -4,7 +4,13 @@ import unittest
 from argparse import Namespace
 from pathlib import Path
 
-from src.hash_lab.experiments import flip_one_bit, hamming_distance, save_results
+from src.hash_lab.experiments import (
+    distinguish,
+    flip_one_bit,
+    hamming_distance,
+    majority_baseline_accuracy,
+    save_results,
+)
 from src.hash_lab.mini_sha import digest, digest_bits, pad_block
 
 
@@ -29,6 +35,20 @@ class MiniShaTests(unittest.TestCase):
 
     def test_hamming_distance(self):
         self.assertEqual(hamming_distance(b"\x00", b"\xff"), 8)
+
+    def test_majority_baseline_accuracy(self):
+        rows = [([0], 1), ([1], 1), ([0], 0), ([1], 1)]
+
+        self.assertEqual(majority_baseline_accuracy(rows), 0.75)
+
+    def test_distinguish_reports_random_guess_baseline_delta(self):
+        result = distinguish(rounds=2, samples=20, epochs=1, seed=1)
+
+        self.assertEqual(result.random_guess_baseline, 0.5)
+        self.assertAlmostEqual(
+            result.test_accuracy_minus_baseline,
+            result.test_accuracy - result.random_guess_baseline,
+        )
 
     def test_save_results_csv(self):
         output = Path("results/test-save-results.csv")
