@@ -84,9 +84,11 @@ For reference Issues, capture URL, book title, paper title, authors, year, DOI, 
 ## Implementing Issues
 
 - Use `.venv` for Python commands.
+- Before experiment analysis, read `docs/research-state.md`, `results/README.md`, relevant `results/*/notes.md`, and relevant `references/notes/`.
 - Add a baseline before AI/neural experiments.
 - Save experiment outputs under `results/` when results are part of the task.
 - Update `references/` for literature tasks.
+- Update `docs/research-state.md` when a completed experiment or reference task changes the current interpretation of the project.
 - Run the relevant test or CLI sample before finishing.
 - Report changed files, verification, and remaining limitations in the Issue or final response.
 

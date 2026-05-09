@@ -29,6 +29,8 @@ python -m src.hash_lab.cli distinguish --rounds 2 4 8 16 --samples 1000 --epochs
 
 実験ノートを書くときは `docs/experiment-log-template.md` を使います。書き方の例として、`docs/experiment-log-example-avalanche-mini-sha.md` に mini-sha avalanche の小規模実験ノートがあります。
 
+現在の実験結果と先行研究の接続は `docs/research-state.md` にまとめています。保存済み結果の索引は `results/README.md`、文献メモは `references/notes/` を参照してください。
+
 ## Working Rules
 
 このリポジトリで作業するときの一次参照は `AGENTS.md` です。Repo内Skillは `.agents/skills/hash-lab-research/` にあります。
