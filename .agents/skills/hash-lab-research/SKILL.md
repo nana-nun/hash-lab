@@ -9,12 +9,14 @@ description: Use when working in the hash-lab repository on reduced-round hash e
 
 1. Read `AGENTS.md` first and follow it as the primary policy.
 2. Keep the research scope limited to toy hash, reduced-round SHA-like hash, and small-scale simulations.
-3. Store research notes as Markdown and keep references under `references/`.
-4. Use `.venv` before running Python commands.
-5. Add a simple baseline before AI/neural experiments.
-6. Record commands, seed, config, metrics, and limitations when saving results.
-7. For Issue-driven tasks, read `docs/issue-workflow-human.md` and `.agents/issue-workflow-ai.md`.
-8. Run the relevant test or CLI sample after implementation.
+3. Read `docs/research-state.md` and `results/README.md` before planning new experiments or interpreting existing results.
+4. Read relevant `results/*/notes.md`, metrics CSV/JSON, and `references/notes/` files before making claims about what is known.
+5. Store research notes as Markdown and keep references under `references/`.
+6. Use `.venv` before running Python commands.
+7. Add a simple baseline before AI/neural experiments.
+8. Record commands, seed, config, metrics, and limitations when saving results.
+9. For Issue-driven tasks, read `docs/issue-workflow-human.md` and `.agents/issue-workflow-ai.md`.
+10. Run the relevant test or CLI sample after implementation.
 
 ## Research Notes
 

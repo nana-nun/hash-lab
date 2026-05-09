@@ -10,6 +10,8 @@ Use this skill after `hash-lab-issue-runner` has confirmed the Issue, labels, br
 ## Check Before Work
 
 - Confirm the Issue states a concrete question, hypothesis, baseline, metrics, and reproducibility details.
+- Read `docs/research-state.md` and `results/README.md` before designing or interpreting an experiment.
+- Read any relevant prior `results/*/notes.md`, metrics CSV/JSON, and `references/notes/` files before claiming novelty or interpreting a result.
 - If the Issue does not name a baseline, add the simplest relevant one before any neural or advanced model work.
 - Keep the experiment local, reduced-scale, and inside toy hash or reduced-round SHA-like scope.
 - Prefer small runs first. Record when a result is exploratory rather than conclusive.
@@ -39,6 +41,7 @@ Use `docs/experiment-log-template.md` and keep these sections separate:
 - Run the exact CLI sample, script, or test that exercises the experiment path.
 - Record command, seed, target hash or rounds, dataset size, model config, metrics, and execution timestamp when results are saved.
 - Compare results against the baseline in the notes or final report.
+- Compare new interpretations against `docs/research-state.md`; update it when the current understanding changes.
 - Do not overstate negative results; say what was not tested.
 
 ## Done Criteria
