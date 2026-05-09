@@ -27,6 +27,8 @@ python -m src.hash_lab.cli distinguish --rounds 2 4 8 16 --samples 1000 --epochs
 
 `--output` を指定しない場合は、従来どおり標準出力だけに結果を表示します。保存するCSVには `experiment`、`seed`、`rounds`、`samples` などの実行条件を含めます。JSONは `metadata` と `results` に分けて保存します。
 
+実験ノートを書くときは `docs/experiment-log-template.md` を使います。書き方の例として、`docs/experiment-log-example-avalanche-mini-sha.md` に mini-sha avalanche の小規模実験ノートがあります。
+
 ## Working Rules
 
 このリポジトリで作業するときの一次参照は `AGENTS.md` です。Repo内Skillは `.agents/skills/hash-lab-research/` にあります。
