@@ -5,10 +5,13 @@ from argparse import Namespace
 from pathlib import Path
 
 from src.hash_lab.experiments import (
+    avalanche_ratios,
+    bootstrap_mean_ci,
     distinguish,
     flip_one_bit,
     hamming_distance,
     majority_baseline_accuracy,
+    percentile,
     save_results,
 )
 from src.hash_lab.mini_sha import digest, digest_bits, pad_block
@@ -35,6 +38,24 @@ class MiniShaTests(unittest.TestCase):
 
     def test_hamming_distance(self):
         self.assertEqual(hamming_distance(b"\x00", b"\xff"), 8)
+
+    def test_avalanche_ratios_are_reproducible(self):
+        left = avalanche_ratios(rounds=4, samples=5, seed=7)
+        right = avalanche_ratios(rounds=4, samples=5, seed=7)
+
+        self.assertEqual(left, right)
+        self.assertEqual(len(left), 5)
+        self.assertTrue(all(0 <= ratio <= 1 for ratio in left))
+
+    def test_percentile_interpolates(self):
+        self.assertEqual(percentile([0.0, 10.0], 0.5), 5.0)
+
+    def test_bootstrap_mean_ci_is_reproducible(self):
+        left = bootstrap_mean_ci([0.0, 0.5, 1.0], iterations=20, seed=3)
+        right = bootstrap_mean_ci([0.0, 0.5, 1.0], iterations=20, seed=3)
+
+        self.assertEqual(left, right)
+        self.assertLessEqual(left[0], left[1])
 
     def test_majority_baseline_accuracy(self):
         rows = [([0], 1), ([1], 1), ([0], 0), ([1], 1)]

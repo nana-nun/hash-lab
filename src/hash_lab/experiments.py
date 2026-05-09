@@ -24,6 +24,23 @@ class AvalancheResult:
 
 
 @dataclass(frozen=True)
+class BootstrapResult:
+    rounds: int
+    seeds: int
+    samples_per_seed: int
+    total_samples: int
+    baseline: float
+    mean: float
+    ci_level: float
+    ci_low: float
+    ci_high: float
+    baseline_delta: float
+    baseline_delta_ci_low: float
+    baseline_delta_ci_high: float
+    ci_contains_baseline: bool
+
+
+@dataclass(frozen=True)
 class DistinguishResult:
     rounds: int
     samples: int
@@ -48,7 +65,7 @@ def flip_one_bit(data: bytes, bit_index: int) -> bytes:
     return bytes(values)
 
 
-def avalanche(rounds: int, samples: int, input_bytes: int = 32, seed: int = 1) -> AvalancheResult:
+def avalanche_ratios(rounds: int, samples: int, input_bytes: int = 32, seed: int = 1) -> list[float]:
     rng = random.Random(seed)
     ratios: list[float] = []
 
@@ -60,16 +77,71 @@ def avalanche(rounds: int, samples: int, input_bytes: int = 32, seed: int = 1) -
         right = digest(changed, rounds=rounds)
         ratios.append(hamming_distance(left, right) / (len(left) * 8))
 
+    return ratios
+
+
+def summarize_ratios(rounds: int, ratios: list[float]) -> AvalancheResult:
     mean = sum(ratios) / len(ratios)
     variance = sum((item - mean) ** 2 for item in ratios) / len(ratios)
     return AvalancheResult(
         rounds=rounds,
-        samples=samples,
+        samples=len(ratios),
         mean=mean,
         stdev=math.sqrt(variance),
         minimum=min(ratios),
         maximum=max(ratios),
     )
+
+
+def avalanche(rounds: int, samples: int, input_bytes: int = 32, seed: int = 1) -> AvalancheResult:
+    return summarize_ratios(
+        rounds,
+        avalanche_ratios(rounds, samples=samples, input_bytes=input_bytes, seed=seed),
+    )
+
+
+def percentile(sorted_values: list[float], probability: float) -> float:
+    if not sorted_values:
+        raise ValueError("values must not be empty")
+    if probability < 0 or probability > 1:
+        raise ValueError("probability must be between 0 and 1")
+    if len(sorted_values) == 1:
+        return sorted_values[0]
+
+    index = probability * (len(sorted_values) - 1)
+    lower = math.floor(index)
+    upper = math.ceil(index)
+    if lower == upper:
+        return sorted_values[lower]
+    weight = index - lower
+    return sorted_values[lower] * (1 - weight) + sorted_values[upper] * weight
+
+
+def bootstrap_mean_ci(
+    values: list[float],
+    iterations: int = 2000,
+    ci_level: float = 0.95,
+    seed: int = 1,
+) -> tuple[float, float]:
+    if not values:
+        raise ValueError("values must not be empty")
+    if iterations < 1:
+        raise ValueError("iterations must be positive")
+    if ci_level <= 0 or ci_level >= 1:
+        raise ValueError("ci_level must be between 0 and 1")
+
+    rng = random.Random(seed)
+    sample_size = len(values)
+    means: list[float] = []
+    for _ in range(iterations):
+        total = 0.0
+        for _ in range(sample_size):
+            total += values[rng.randrange(sample_size)]
+        means.append(total / sample_size)
+
+    means.sort()
+    tail = (1 - ci_level) / 2
+    return percentile(means, tail), percentile(means, 1 - tail)
 
 
 def sigmoid(x: float) -> float:
@@ -224,6 +296,110 @@ def run_avalanche(args: argparse.Namespace) -> None:
     )
 
 
+def run_avalanche_bootstrap(args: argparse.Namespace) -> None:
+    sample_rows: list[dict[str, object]] = []
+    summary_rows: list[dict[str, object]] = []
+
+    for rounds in args.rounds:
+        round_ratios: list[float] = []
+        for seed in args.seeds:
+            ratios = avalanche_ratios(rounds, samples=args.samples, seed=seed)
+            round_ratios.extend(ratios)
+            for sample_index, ratio in enumerate(ratios):
+                sample_rows.append(
+                    {
+                        "experiment": "avalanche_bootstrap",
+                        "rounds": rounds,
+                        "seed": seed,
+                        "sample_index": sample_index,
+                        "flip_ratio": f"{ratio:.8f}",
+                    }
+                )
+
+        result = summarize_ratios(rounds, round_ratios)
+        ci_low, ci_high = bootstrap_mean_ci(
+            round_ratios,
+            iterations=args.bootstrap_iterations,
+            ci_level=args.ci_level,
+            seed=args.bootstrap_seed + rounds,
+        )
+        bootstrap = BootstrapResult(
+            rounds=rounds,
+            seeds=len(args.seeds),
+            samples_per_seed=args.samples,
+            total_samples=len(round_ratios),
+            baseline=args.baseline,
+            mean=result.mean,
+            ci_level=args.ci_level,
+            ci_low=ci_low,
+            ci_high=ci_high,
+            baseline_delta=result.mean - args.baseline,
+            baseline_delta_ci_low=ci_low - args.baseline,
+            baseline_delta_ci_high=ci_high - args.baseline,
+            ci_contains_baseline=ci_low <= args.baseline <= ci_high,
+        )
+        summary_rows.append(
+            {
+                "rounds": bootstrap.rounds,
+                "seeds": bootstrap.seeds,
+                "samples_per_seed": bootstrap.samples_per_seed,
+                "total_samples": bootstrap.total_samples,
+                "baseline": f"{bootstrap.baseline:.6f}",
+                "mean": f"{bootstrap.mean:.6f}",
+                "ci_level": f"{bootstrap.ci_level:.6f}",
+                "ci_method": "per_sample_percentile_bootstrap",
+                "bootstrap_iterations": args.bootstrap_iterations,
+                "bootstrap_seed": args.bootstrap_seed + rounds,
+                "ci_low": f"{bootstrap.ci_low:.6f}",
+                "ci_high": f"{bootstrap.ci_high:.6f}",
+                "baseline_delta": f"{bootstrap.baseline_delta:.6f}",
+                "baseline_delta_ci_low": f"{bootstrap.baseline_delta_ci_low:.6f}",
+                "baseline_delta_ci_high": f"{bootstrap.baseline_delta_ci_high:.6f}",
+                "ci_contains_baseline": bootstrap.ci_contains_baseline,
+                "min": f"{result.minimum:.6f}",
+                "max": f"{result.maximum:.6f}",
+            }
+        )
+
+    print(
+        "rounds,seeds,samples_per_seed,total_samples,baseline,mean,ci_level,ci_method,"
+        "bootstrap_iterations,bootstrap_seed,ci_low,ci_high,baseline_delta,"
+        "baseline_delta_ci_low,baseline_delta_ci_high,ci_contains_baseline,min,max"
+    )
+    for row in summary_rows:
+        print(",".join(str(row[field]) for field in row))
+
+    write_rows_csv(
+        args.samples_output,
+        ["experiment", "rounds", "seed", "sample_index", "flip_ratio"],
+        sample_rows,
+    )
+    write_rows_csv(
+        args.summary_output,
+        [
+            "rounds",
+            "seeds",
+            "samples_per_seed",
+            "total_samples",
+            "baseline",
+            "mean",
+            "ci_level",
+            "ci_method",
+            "bootstrap_iterations",
+            "bootstrap_seed",
+            "ci_low",
+            "ci_high",
+            "baseline_delta",
+            "baseline_delta_ci_low",
+            "baseline_delta_ci_high",
+            "ci_contains_baseline",
+            "min",
+            "max",
+        ],
+        summary_rows,
+    )
+
+
 def run_distinguish(args: argparse.Namespace) -> None:
     print(
         "rounds,samples,epochs,random_guess_baseline,majority_baseline,"
@@ -285,6 +461,18 @@ def build_parser() -> argparse.ArgumentParser:
     avalanche_parser = subparsers.add_parser("avalanche")
     add_common_rounds(avalanche_parser)
     avalanche_parser.set_defaults(func=run_avalanche)
+
+    avalanche_bootstrap_parser = subparsers.add_parser("avalanche-bootstrap")
+    avalanche_bootstrap_parser.add_argument("--rounds", nargs="+", type=int, required=True)
+    avalanche_bootstrap_parser.add_argument("--samples", type=int, default=500)
+    avalanche_bootstrap_parser.add_argument("--seeds", nargs="+", type=int, required=True)
+    avalanche_bootstrap_parser.add_argument("--samples-output", type=Path, required=True)
+    avalanche_bootstrap_parser.add_argument("--summary-output", type=Path, required=True)
+    avalanche_bootstrap_parser.add_argument("--bootstrap-iterations", type=int, default=2000)
+    avalanche_bootstrap_parser.add_argument("--bootstrap-seed", type=int, default=20260510)
+    avalanche_bootstrap_parser.add_argument("--ci-level", type=float, default=0.95)
+    avalanche_bootstrap_parser.add_argument("--baseline", type=float, default=0.5)
+    avalanche_bootstrap_parser.set_defaults(func=run_avalanche_bootstrap)
 
     distinguish_parser = subparsers.add_parser("distinguish")
     add_common_rounds(distinguish_parser)

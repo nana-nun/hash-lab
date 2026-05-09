@@ -1,0 +1,16 @@
+{
+  "experiment": "avalanche_bootstrap",
+  "executed_at": "2026-05-10T00:31:50+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m src.hash_lab.cli avalanche-bootstrap --rounds 2 4 8 16 32 --samples 2000 --seeds 1 2 3 4 5 --bootstrap-iterations 2000 --bootstrap-seed 20260510 --samples-output results/2026-05-10-avalanche-mini-sha-bootstrap/per_sample_flip_ratios.csv --summary-output results/2026-05-10-avalanche-mini-sha-bootstrap/bootstrap_metrics.csv",
+  "hash": "mini-sha",
+  "rounds": [2, 4, 8, 16, 32],
+  "seeds": [1, 2, 3, 4, 5],
+  "samples_per_seed": 2000,
+  "total_samples_per_round": 10000,
+  "baseline": 0.5,
+  "ci_level": 0.95,
+  "ci_method": "per_sample_percentile_bootstrap",
+  "bootstrap_iterations": 2000,
+  "bootstrap_seed_base": 20260510,
+  "model_config": null
+}
