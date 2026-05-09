@@ -79,15 +79,20 @@ results/
 ## Issue Workflow
 
 - タスク管理は GitHub Issue を基本にする。
+- Issueの進行状況は GitHub Projects でも確認する。現在のProjectは `https://github.com/users/nana-nun/projects/2` を使う。
 - 人間向けの運用は `docs/issue-workflow-human.md` を参照する。
 - AI向けの運用は `.agents/issue-workflow-ai.md` を参照する。
 - AIエージェントが GitHub CLI を使う場合は、フルパスではなく `gh ...` 形式で実行する。
+- GitHub Projects を `gh project ...` で確認するには `read:project` scope が必要な場合がある。権限不足なら `gh auth refresh --hostname github.com -s read:project` を案内する。Status更新まで行う場合は `project` scope が必要になる場合がある。
 - よく使うコマンド例:
   - `gh issue list --repo nana-nun/hash-lab --state open --limit 20`
   - `gh issue view <number> --repo nana-nun/hash-lab`
+  - `gh project view 2 --owner "@me" --format json`
+  - `gh project item-list 2 --owner "@me" --format json --limit 100`
   - `gh issue create --repo nana-nun/hash-lab --title "<title>" --label "t:exp" --body "<body>"`
   - `gh pr create --repo nana-nun/hash-lab --base master --head <branch> --title "<title>" --body "<body>"`
 - Issueは `t:exp`、`t:ref`、`t:impl`、`t:docs`、`t:maint` のいずれかを基本分類にする。
+- Issueラベルは基本分類の `t:*` と優先度の `p:*` を使い、進行状況は GitHub Projects の `Status` で管理する。新規Issueに `s:*` ラベルは付けない。
 - 実装前に関連Issueを確認し、完了後にテスト結果、実験結果、制限、残課題をIssueまたは最終応答に残す。
 - 実装ブランチを切る前に `git fetch origin` し、原則として最新の `origin/main` から開始する。
 - 未マージPRの成果物に依存するIssueは、そのPRブランチから派生し、PR本文に依存関係を書く。

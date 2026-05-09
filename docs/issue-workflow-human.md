@@ -38,11 +38,24 @@ hash-lab では、研究・実験・参考資料収集・コード生成を GitH
 
 ## Status
 
-| Label | 意味 |
+進行状況はIssueラベルではなく、GitHub Projects の `Status` で管理します。
+
+現在のProject:
+
+- `https://github.com/users/nana-nun/projects/2`
+
+推奨する `Status`:
+
+| Status | 意味 |
 | --- | --- |
-| `s:ready` | 着手可能 |
-| `s:block` | 外部要因や判断待ち |
-| `s:research` | 先に調査が必要 |
+| `Todo` | 未着手 |
+| `Ready` | 着手可能 |
+| `In Progress` | 作業中 |
+| `Review` | PR確認中、または人間の確認待ち |
+| `Blocked` | 外部要因や判断待ち |
+| `Done` | 完了 |
+
+`s:ready`、`s:block`、`s:research` のような状態ラベルは新規Issueでは使いません。
 
 ## Title Format
 
