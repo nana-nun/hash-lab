@@ -1,0 +1,38 @@
+{
+  "experiment": "avalanche_uncertainty",
+  "issue": 20,
+  "command": ".\\.venv\\Scripts\\python.exe -c \"<inline script>\"",
+  "executed_at": "2026-05-09T23:19:05+09:00",
+  "source_files": [
+    "results\\2026-05-09-avalanche-mini-sha-multi-seed\\seed_metrics.csv",
+    "results\\2026-05-09-avalanche-mini-sha-multi-seed\\aggregate_metrics.csv"
+  ],
+  "hash": "mini-sha",
+  "rounds": [
+    2,
+    4,
+    8,
+    16,
+    32
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "samples_per_seed_round": 2000,
+  "baseline": 0.5,
+  "uncertainty_method": {
+    "unit": "seed-level mean flip ratio",
+    "standard_deviation": "sample standard deviation across seed means",
+    "standard_error": "sample_stdev_across_seeds / sqrt(seeds)",
+    "confidence_interval": "two-sided 95% t interval across seed means with df=4",
+    "t_critical": 2.7764451051977987
+  },
+  "output_files": [
+    "uncertainty_metrics.csv",
+    "notes.md"
+  ]
+}

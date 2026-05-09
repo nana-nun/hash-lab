@@ -1,0 +1,6 @@
+rounds,seeds,samples_per_seed,baseline,mean_of_means,sample_stdev_across_seeds,standard_error,ci_level,ci_method,ci_low,ci_high,baseline_delta,baseline_delta_ci_low,baseline_delta_ci_high,ci_contains_baseline,min_seed_mean,max_seed_mean
+2,5,2000,0.500000,0.014140,0.000937,0.000419,0.950000,t_interval_across_seed_means_df4,0.012977,0.015303,-0.485860,-0.487023,-0.484697,False,0.012800,0.015100
+4,5,2000,0.500000,0.083360,0.003141,0.001404,0.950000,t_interval_across_seed_means_df4,0.079461,0.087259,-0.416640,-0.420539,-0.412741,False,0.079100,0.086300
+8,5,2000,0.500000,0.325880,0.005360,0.002397,0.950000,t_interval_across_seed_means_df4,0.319224,0.332536,-0.174120,-0.180776,-0.167464,False,0.317500,0.332100
+16,5,2000,0.500000,0.500120,0.000864,0.000387,0.950000,t_interval_across_seed_means_df4,0.499047,0.501193,0.000120,-0.000953,0.001193,True,0.498800,0.501100
+32,5,2000,0.500000,0.499880,0.000522,0.000233,0.950000,t_interval_across_seed_means_df4,0.499232,0.500528,-0.000120,-0.000768,0.000528,True,0.499200,0.500500
