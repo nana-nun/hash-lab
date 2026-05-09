@@ -42,6 +42,31 @@ class BootstrapResult:
 
 
 @dataclass(frozen=True)
+class BitAvalancheResult:
+    rounds: int
+    seed: int
+    samples: int
+    output_bits: int
+    flip_counts: tuple[int, ...]
+
+    @property
+    def flip_rates(self) -> tuple[float, ...]:
+        return tuple(count / self.samples for count in self.flip_counts)
+
+    @property
+    def mean_flip_rate(self) -> float:
+        return sum(self.flip_rates) / self.output_bits
+
+    @property
+    def min_flip_rate(self) -> float:
+        return min(self.flip_rates)
+
+    @property
+    def max_flip_rate(self) -> float:
+        return max(self.flip_rates)
+
+
+@dataclass(frozen=True)
 class DistinguishResult:
     rounds: int
     samples: int
@@ -98,6 +123,37 @@ def avalanche(rounds: int, samples: int, input_bytes: int = 32, seed: int = 1) -
     return summarize_ratios(
         rounds,
         avalanche_ratios(rounds, samples=samples, input_bytes=input_bytes, seed=seed),
+    )
+
+
+def bit_avalanche(
+    rounds: int,
+    samples: int,
+    input_bytes: int = 32,
+    output_bytes: int = 32,
+    seed: int = 1,
+) -> BitAvalancheResult:
+    rng = random.Random(seed)
+    output_bits = output_bytes * 8
+    flip_counts = [0] * output_bits
+
+    for _ in range(samples):
+        data = rng.randbytes(input_bytes)
+        bit_index = rng.randrange(input_bytes * 8)
+        changed = flip_one_bit(data, bit_index)
+        left = digest(data, rounds=rounds, output_bytes=output_bytes)
+        right = digest(changed, rounds=rounds, output_bytes=output_bytes)
+        for byte_index, value in enumerate(a ^ b for a, b in zip(left, right)):
+            for shift in range(7, -1, -1):
+                output_bit_index = byte_index * 8 + (7 - shift)
+                flip_counts[output_bit_index] += (value >> shift) & 1
+
+    return BitAvalancheResult(
+        rounds=rounds,
+        seed=seed,
+        samples=samples,
+        output_bits=output_bits,
+        flip_counts=tuple(flip_counts),
     )
 
 
@@ -447,6 +503,73 @@ def run_avalanche_bootstrap(args: argparse.Namespace) -> None:
     )
 
 
+def run_avalanche_bits(args: argparse.Namespace) -> None:
+    bit_rows: list[dict[str, object]] = []
+    summary_rows: list[dict[str, object]] = []
+
+    for rounds in args.rounds:
+        seed_results = [
+            bit_avalanche(rounds, samples=args.samples, seed=seed, output_bytes=args.output_bytes)
+            for seed in args.seeds
+        ]
+        output_bits = seed_results[0].output_bits
+        aggregate_counts = [0] * output_bits
+
+        for result in seed_results:
+            for bit_index, (count, rate) in enumerate(zip(result.flip_counts, result.flip_rates)):
+                aggregate_counts[bit_index] += count
+                bit_rows.append(
+                    {
+                        "rounds": result.rounds,
+                        "seed": result.seed,
+                        "samples": result.samples,
+                        "output_bit_index": bit_index,
+                        "flip_count": count,
+                        "flip_rate": f"{rate:.6f}",
+                    }
+                )
+
+        aggregate_samples = args.samples * len(args.seeds)
+        aggregate_rates = [count / aggregate_samples for count in aggregate_counts]
+        summary_rows.append(
+            {
+                "rounds": rounds,
+                "seeds": len(args.seeds),
+                "samples_per_seed": args.samples,
+                "total_samples": aggregate_samples,
+                "output_bits": output_bits,
+                "mean_flip_rate": f"{sum(aggregate_rates) / output_bits:.6f}",
+                "min_flip_rate": f"{min(aggregate_rates):.6f}",
+                "min_bit_index": aggregate_rates.index(min(aggregate_rates)),
+                "max_flip_rate": f"{max(aggregate_rates):.6f}",
+                "max_bit_index": aggregate_rates.index(max(aggregate_rates)),
+                "max_abs_delta_from_baseline": f"{max(abs(rate - args.baseline) for rate in aggregate_rates):.6f}",
+            }
+        )
+
+    bit_fieldnames = ["rounds", "seed", "samples", "output_bit_index", "flip_count", "flip_rate"]
+    summary_fieldnames = [
+        "rounds",
+        "seeds",
+        "samples_per_seed",
+        "total_samples",
+        "output_bits",
+        "mean_flip_rate",
+        "min_flip_rate",
+        "min_bit_index",
+        "max_flip_rate",
+        "max_bit_index",
+        "max_abs_delta_from_baseline",
+    ]
+
+    print(",".join(summary_fieldnames))
+    for row in summary_rows:
+        print(",".join(str(row[field]) for field in summary_fieldnames))
+
+    write_rows_csv(args.bit_output, bit_fieldnames, bit_rows)
+    write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
+
+
 def run_avalanche_seed_bootstrap(args: argparse.Namespace) -> None:
     ratios_by_round = read_per_sample_ratios(args.samples_input)
     per_sample_metrics = (
@@ -601,6 +724,16 @@ def build_parser() -> argparse.ArgumentParser:
     avalanche_bootstrap_parser.add_argument("--ci-level", type=float, default=0.95)
     avalanche_bootstrap_parser.add_argument("--baseline", type=float, default=0.5)
     avalanche_bootstrap_parser.set_defaults(func=run_avalanche_bootstrap)
+
+    avalanche_bits_parser = subparsers.add_parser("avalanche-bits")
+    avalanche_bits_parser.add_argument("--rounds", nargs="+", type=int, required=True)
+    avalanche_bits_parser.add_argument("--samples", type=int, default=500)
+    avalanche_bits_parser.add_argument("--seeds", nargs="+", type=int, required=True)
+    avalanche_bits_parser.add_argument("--bit-output", type=Path, required=True)
+    avalanche_bits_parser.add_argument("--summary-output", type=Path, required=True)
+    avalanche_bits_parser.add_argument("--output-bytes", type=int, default=32)
+    avalanche_bits_parser.add_argument("--baseline", type=float, default=0.5)
+    avalanche_bits_parser.set_defaults(func=run_avalanche_bits)
 
     avalanche_seed_bootstrap_parser = subparsers.add_parser("avalanche-seed-bootstrap")
     avalanche_seed_bootstrap_parser.add_argument("--rounds", nargs="+", type=int, required=True)

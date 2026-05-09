@@ -1,0 +1,13 @@
+{
+  "experiment": "avalanche_bit_positions",
+  "executed_at": "2026-05-10T01:23:32+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m src.hash_lab.cli avalanche-bits --rounds 2 4 8 16 32 --samples 2000 --seeds 1 2 3 4 5 --bit-output results/2026-05-10-avalanche-mini-sha-bit-positions/bit_metrics.csv --summary-output results/2026-05-10-avalanche-mini-sha-bit-positions/round_summary.csv",
+  "hash": "mini-sha",
+  "rounds": [2, 4, 8, 16, 32],
+  "seeds": [1, 2, 3, 4, 5],
+  "samples_per_seed": 2000,
+  "total_samples_per_round": 10000,
+  "output_bits": 256,
+  "baseline": 0.5,
+  "model_config": null
+}
