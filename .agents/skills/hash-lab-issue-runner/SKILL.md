@@ -21,13 +21,16 @@ Use this skill for one GitHub Issue at a time in the `hash-lab` repository.
 5. Confirm the Issue stays within hash-lab scope: toy hash, reduced-round SHA-like hash, avalanche measurement, local baselines, small simulations, references, docs, or maintenance.
 6. Do not proceed with wallet, private key, signature, live network, mining pool, production system, or misuse-enabling tasks.
 7. Check `git status --short --branch` before edits and preserve unrelated user changes.
-8. Create a dedicated branch named `issue-<number>-<short-slug>`.
-9. Use the project `.venv` for Python commands. Create it only if missing.
-10. Make the smallest change that satisfies the Issue, using the label skill for output placement and verification details.
-11. Run the relevant tests, validation command, or CLI sample before finishing.
-12. Review any `Limitations` and `Next` notes. If a concrete follow-up is needed, create a separate GitHub Issue before finishing instead of hiding the work in the PR text.
-13. Commit the changes, push the branch, and create a PR with `gh pr create`.
-14. Include the Issue closing keyword, changed files summary, verification commands, results, limitations, created follow-up Issues, and remaining follow-ups in the PR body or final response.
+8. Before creating the branch, synchronize the base with `git fetch origin` and start from the latest `origin/main` unless the Issue explicitly depends on an unmerged PR.
+9. If the Issue depends on an unmerged PR, branch from that PR branch and say so in the PR body. Do not create a sibling PR from stale `main` when it updates shared files such as `docs/research-state.md`, `results/README.md`, or `src/hash_lab/experiments.py`.
+10. Create a dedicated branch named `issue-<number>-<short-slug>`.
+11. Use the project `.venv` for Python commands. Create it only if missing.
+12. Make the smallest change that satisfies the Issue, using the label skill for output placement and verification details.
+13. Run the relevant tests, validation command, or CLI sample before finishing.
+14. Before committing or opening the PR, fetch and merge or rebase the latest `origin/main`, resolve conflicts locally, and rerun verification. Prefer fixing conflicts before the PR is created over leaving GitHub's "This branch has conflicts" state for the user.
+15. Review any `Limitations` and `Next` notes. If a concrete follow-up is needed, create a separate GitHub Issue before finishing instead of hiding the work in the PR text.
+16. Commit the changes, push the branch, and create a PR with `gh pr create`.
+17. Include the Issue closing keyword, changed files summary, verification commands, results, limitations, created follow-up Issues, and remaining follow-ups in the PR body or final response.
 
 ## Experiment Notes
 

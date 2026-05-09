@@ -89,6 +89,9 @@ results/
   - `gh pr create --repo nana-nun/hash-lab --base master --head <branch> --title "<title>" --body "<body>"`
 - Issueは `t:exp`、`t:ref`、`t:impl`、`t:docs`、`t:maint` のいずれかを基本分類にする。
 - 実装前に関連Issueを確認し、完了後にテスト結果、実験結果、制限、残課題をIssueまたは最終応答に残す。
+- 実装ブランチを切る前に `git fetch origin` し、原則として最新の `origin/main` から開始する。
+- 未マージPRの成果物に依存するIssueは、そのPRブランチから派生し、PR本文に依存関係を書く。
+- `docs/research-state.md`、`results/README.md`、`src/hash_lab/experiments.py` のような共有ファイルを更新する場合は、PR作成前に最新の `origin/main` を取り込み、衝突をローカルで解消してからpushする。
 - scope外の攻撃的タスクはIssue化しない。既にある場合も進めず、研究範囲内の安全な代替に分解する。
 
 ## Python

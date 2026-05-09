@@ -83,6 +83,9 @@ For reference Issues, capture URL, book title, paper title, authors, year, DOI, 
 
 ## Implementing Issues
 
+- Before creating an implementation branch, run `git fetch origin` and start from the latest `origin/main`.
+- If the Issue depends on an unmerged PR, branch from that PR branch and mention the dependency in the PR body.
+- Avoid sibling PRs from stale `main` when changing shared files such as `docs/research-state.md`, `results/README.md`, or `src/hash_lab/experiments.py`; these files are frequent conflict points.
 - Use `.venv` for Python commands.
 - Before experiment analysis, read `docs/research-state.md`, `results/README.md`, relevant `results/*/notes.md`, and relevant `references/notes/`.
 - Add a baseline before AI/neural experiments.
@@ -90,6 +93,7 @@ For reference Issues, capture URL, book title, paper title, authors, year, DOI, 
 - Update `references/` for literature tasks.
 - Update `docs/research-state.md` when a completed experiment or reference task changes the current interpretation of the project.
 - Run the relevant test or CLI sample before finishing.
+- Before opening a PR, fetch and merge or rebase the latest `origin/main`, resolve conflicts locally, and rerun verification.
 - Report changed files, verification, and remaining limitations in the Issue or final response.
 
 ## Label Skills
