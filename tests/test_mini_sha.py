@@ -5,7 +5,9 @@ from argparse import Namespace
 from pathlib import Path
 
 from src.hash_lab.experiments import (
+    avalanche,
     avalanche_ratios,
+    bit_avalanche,
     bootstrap_mean_ci,
     distinguish,
     flip_one_bit,
@@ -46,6 +48,13 @@ class MiniShaTests(unittest.TestCase):
         self.assertEqual(left, right)
         self.assertEqual(len(left), 5)
         self.assertTrue(all(0 <= ratio <= 1 for ratio in left))
+
+    def test_bit_avalanche_mean_matches_avalanche_mean(self):
+        aggregate = avalanche(rounds=4, samples=10, seed=2)
+        per_bit = bit_avalanche(rounds=4, samples=10, seed=2)
+
+        self.assertEqual(len(per_bit.flip_counts), 256)
+        self.assertAlmostEqual(per_bit.mean_flip_rate, aggregate.mean)
 
     def test_percentile_interpolates(self):
         self.assertEqual(percentile([0.0, 10.0], 0.5), 5.0)

@@ -10,6 +10,7 @@
 | `2026-05-09-avalanche-mini-sha-multi-seed/` | avalanche | `seed_metrics.csv`, `aggregate_metrics.csv`, `notes.md` | seeds `1..5`、各round `2000 samples`。16/32 rounds は複数seedでも `0.5` 付近。 |
 | `2026-05-09-avalanche-mini-sha-uncertainty/` | avalanche uncertainty | `uncertainty_metrics.csv`, `config.json`, `notes.md` | seed mean から標準誤差と簡易95% t区間を計算。2/4/8 rounds は baseline `0.5` を含まず、16/32 rounds は含む。 |
 | `2026-05-10-avalanche-mini-sha-bootstrap/` | avalanche uncertainty | `per_sample_flip_ratios.csv`, `bootstrap_metrics.csv`, `config.json`, `notes.md` | per-sample flip ratio を保存し、percentile bootstrap 95% CI を計算。2/4/8 rounds は baseline `0.5` を含まず、16/32 rounds は含む。 |
+| `2026-05-10-avalanche-mini-sha-bit-positions/` | avalanche bit positions | `bit_metrics.csv`, `round_summary.csv`, `config.json`, `notes.md` | 出力bit位置ごとの flip rate を測定。2/4/8 rounds はbit別にも大きく偏り、16/32 rounds は aggregate min/max も `0.5` 付近。 |
 | `2026-05-09-distinguish-baseline/` | distinguisher | `metrics.csv`, `config.json`, `notes.md` | logistic regression の seed `1` baseline。2 rounds は識別可能、4/8/16 rounds は random guess 付近。 |
 | `2026-05-09-distinguish-baseline-multi-seed/` | distinguisher | `seed_metrics.csv`, `aggregate_metrics.csv`, `config.json`, `notes.md` | seeds `1..5` の distinguisher baseline。2 rounds は強く識別可能、4/8/16 rounds は平均で baseline 付近。 |
 
