@@ -21,6 +21,17 @@
 - Christophe De Cannière and Christian Rechberger, *Finding SHA-1 Characteristics: General Results and Applications*, 2006.
   - 差分特性探索の考え方の参考。
 
+## Avalanche Criteria and Hash Measurements
+
+- A. F. Webster and Stafford E. Tavares, *On the Design of S-Boxes*, 1986.
+  - avalanche effect と Strict Avalanche Criterion の源流として読む。hash-lab の bit flip 実験で「平均0.5」を baseline にする理由を整理するための基礎文献。
+- Réjane Forré, *The Strict Avalanche Criterion: Spectral Properties of Boolean Functions and an Extended Definition*, 1988.
+  - SAC を Boolean function の spectral property として扱う文献。toy hash の出力bit単位の偏りを見るときの理論背景。
+- Sheelagh Lloyd, *Counting Binary Functions with Certain Cryptographic Properties*, 1992.
+  - SAC、balance、correlation immunity の関係を整理する文献。avalanche だけで「安全」と言い切れない理由の確認に使う。
+- Darshana Upadhyay, Nupur Gaikwad, Marzia Zaman, and Srinivas Sampalli, *Investigating the Avalanche Effect of Various Cryptographically Secure Hash Functions and Hash-Based Applications*, 2022.
+  - 複数の実ハッシュ関数と hash-based application で avalanche / SAC / BIC / randomness tests を測った実験研究。hash-lab の測定項目を増やすときの比較対象。
+
 ## Bitcoin and Mining
 
 - Satoshi Nakamoto, *Bitcoin: A Peer-to-Peer Electronic Cash System*, 2008.
@@ -37,6 +48,12 @@
 
 - Aron Gohr, *Improving Attacks on Round-Reduced Speck32/64 Using Deep Learning*, 2019.
   - neural cryptanalysis の代表的な出発点。
+- Adrien Benamira, David Gerault, Thomas Peyrin, and Quan Quan Tan, *A Deeper Look at Machine Learning-Based Cryptanalysis*, 2021.
+  - Gohr型 neural distinguisher が何を学んでいるかを解釈する文献。hash-lab では neural distinguisher の精度だけでなく、単純な統計量や baseline との差を見る理由になる。
+- Carlo Brunetta and Pablo Picazo-Sanchez, *Modelling Cryptographic Distinguishers Using Machine Learning*, 2022.
+  - distinguish problem を機械学習 classifier として定式化する一般的な方法論。hash出力 vs random bit列の local distinguisher 実験の枠組み整理に使う。
+- Ongee Jeong and Inkyu Moon, *Deep Learning-Based Hash Function Cryptanalysis*, 2024.
+  - MD5 の step 数を変え、fully-connected neural network と BiLSTM で学習する hash function 寄りの最近例。hash-lab の reduced-round/toy hash の学習実験と近いが、短い conference paper なので補助文献として扱う。
 - François-Xavier Standaert, *Introduction to Side-Channel Attacks*, 2010.
   - ML暗号解析とは別系統だが、統計的漏洩・識別の考え方の参考。
 
