@@ -247,6 +247,55 @@ def read_metrics_by_round(path: Path) -> dict[int, dict[str, str]]:
         return {int(row["rounds"]): row for row in csv.DictReader(handle)}
 
 
+def read_bit_metrics(path: Path) -> dict[int, dict[int, dict[str, int]]]:
+    values: dict[int, dict[int, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: {"flips": 0, "samples": 0}))
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            bucket = values[int(row["rounds"])][int(row["output_bit_index"])]
+            bucket["flips"] += int(row["flip_count"])
+            bucket["samples"] += int(row["samples"])
+    return {rounds: dict(bits) for rounds, bits in values.items()}
+
+
+def wilson_score_ci(successes: int, trials: int, z_score: float = 1.959963984540054) -> tuple[float, float]:
+    if trials <= 0:
+        raise ValueError("trials must be positive")
+    if successes < 0 or successes > trials:
+        raise ValueError("successes must be between 0 and trials")
+
+    p_hat = successes / trials
+    z2 = z_score * z_score
+    denominator = 1 + z2 / trials
+    center = (p_hat + z2 / (2 * trials)) / denominator
+    margin = z_score * math.sqrt((p_hat * (1 - p_hat) + z2 / (4 * trials)) / trials) / denominator
+    return max(0.0, center - margin), min(1.0, center + margin)
+
+
+def baseline_normal_p_value(successes: int, trials: int, baseline: float = 0.5) -> float:
+    if trials <= 0:
+        raise ValueError("trials must be positive")
+    if baseline <= 0 or baseline >= 1:
+        raise ValueError("baseline must be between 0 and 1")
+
+    expected = trials * baseline
+    variance = trials * baseline * (1 - baseline)
+    continuity = 0.5 if successes >= expected else -0.5
+    z_score = (successes - expected - continuity) / math.sqrt(variance)
+    return min(1.0, math.erfc(abs(z_score) / math.sqrt(2)))
+
+
+def holm_adjusted_p_values(p_values: list[float]) -> list[float]:
+    indexed = sorted(enumerate(p_values), key=lambda item: item[1])
+    adjusted = [0.0] * len(p_values)
+    running = 0.0
+    total = len(p_values)
+    for rank, (index, p_value) in enumerate(indexed):
+        running = max(running, min(1.0, (total - rank) * p_value))
+        adjusted[index] = running
+    return adjusted
+
+
 def sigmoid(x: float) -> float:
     if x >= 0:
         z = math.exp(-x)
@@ -651,6 +700,99 @@ def run_avalanche_seed_bootstrap(args: argparse.Namespace) -> None:
     write_rows_csv(args.summary_output, fieldnames, summary_rows)
 
 
+def run_avalanche_bit_ci(args: argparse.Namespace) -> None:
+    bits_by_round = read_bit_metrics(args.bit_input)
+    rows: list[dict[str, object]] = []
+    summary_rows: list[dict[str, object]] = []
+
+    for rounds in args.rounds:
+        bit_items = sorted(bits_by_round[rounds].items())
+        raw_p_values = [
+            baseline_normal_p_value(item["flips"], item["samples"], baseline=args.baseline)
+            for _, item in bit_items
+        ]
+        adjusted_p_values = holm_adjusted_p_values(raw_p_values)
+        round_rows: list[dict[str, object]] = []
+
+        for (bit_index, item), raw_p, adjusted_p in zip(bit_items, raw_p_values, adjusted_p_values):
+            flip_rate = item["flips"] / item["samples"]
+            ci_low, ci_high = wilson_score_ci(item["flips"], item["samples"])
+            row = {
+                "rounds": rounds,
+                "output_bit_index": bit_index,
+                "total_samples": item["samples"],
+                "flip_count": item["flips"],
+                "baseline": f"{args.baseline:.6f}",
+                "flip_rate": f"{flip_rate:.6f}",
+                "ci_level": f"{args.ci_level:.6f}",
+                "ci_method": "wilson_score",
+                "ci_low": f"{ci_low:.6f}",
+                "ci_high": f"{ci_high:.6f}",
+                "baseline_delta": f"{flip_rate - args.baseline:.6f}",
+                "ci_contains_baseline": ci_low <= args.baseline <= ci_high,
+                "p_value_method": "normal_approximation_two_sided",
+                "raw_p_value": f"{raw_p:.8g}",
+                "holm_adjusted_p_value": f"{adjusted_p:.8g}",
+                "holm_reject_baseline": adjusted_p < args.alpha,
+            }
+            rows.append(row)
+            round_rows.append(row)
+
+        deltas = [abs(float(row["baseline_delta"])) for row in round_rows]
+        summary_rows.append(
+            {
+                "rounds": rounds,
+                "output_bits": len(round_rows),
+                "total_samples_per_bit": round_rows[0]["total_samples"],
+                "baseline": f"{args.baseline:.6f}",
+                "alpha": f"{args.alpha:.6f}",
+                "min_flip_rate": min(row["flip_rate"] for row in round_rows),
+                "max_flip_rate": max(row["flip_rate"] for row in round_rows),
+                "max_abs_delta_from_baseline": f"{max(deltas):.6f}",
+                "holm_reject_count": sum(row["holm_reject_baseline"] is True for row in round_rows),
+                "ci_excludes_baseline_count": sum(row["ci_contains_baseline"] is False for row in round_rows),
+            }
+        )
+
+    fieldnames = [
+        "rounds",
+        "output_bit_index",
+        "total_samples",
+        "flip_count",
+        "baseline",
+        "flip_rate",
+        "ci_level",
+        "ci_method",
+        "ci_low",
+        "ci_high",
+        "baseline_delta",
+        "ci_contains_baseline",
+        "p_value_method",
+        "raw_p_value",
+        "holm_adjusted_p_value",
+        "holm_reject_baseline",
+    ]
+    summary_fieldnames = [
+        "rounds",
+        "output_bits",
+        "total_samples_per_bit",
+        "baseline",
+        "alpha",
+        "min_flip_rate",
+        "max_flip_rate",
+        "max_abs_delta_from_baseline",
+        "holm_reject_count",
+        "ci_excludes_baseline_count",
+    ]
+
+    print(",".join(summary_fieldnames))
+    for row in summary_rows:
+        print(",".join(str(row[field]) for field in summary_fieldnames))
+
+    write_rows_csv(args.bit_ci_output, fieldnames, rows)
+    write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
+
+
 def run_distinguish(args: argparse.Namespace) -> None:
     print(
         "rounds,samples,epochs,random_guess_baseline,majority_baseline,"
@@ -745,6 +887,15 @@ def build_parser() -> argparse.ArgumentParser:
     avalanche_seed_bootstrap_parser.add_argument("--ci-level", type=float, default=0.95)
     avalanche_seed_bootstrap_parser.add_argument("--baseline", type=float, default=0.5)
     avalanche_seed_bootstrap_parser.set_defaults(func=run_avalanche_seed_bootstrap)
+
+    avalanche_bit_ci_parser = subparsers.add_parser("avalanche-bit-ci")
+    avalanche_bit_ci_parser.add_argument("--rounds", nargs="+", type=int, required=True)
+    avalanche_bit_ci_parser.add_argument("--bit-input", type=Path, required=True)
+    avalanche_bit_ci_parser.add_argument("--bit-ci-output", type=Path, required=True)
+    avalanche_bit_ci_parser.add_argument("--summary-output", type=Path, required=True)
+    avalanche_bit_ci_parser.add_argument("--baseline", type=float, default=0.5)
+    avalanche_bit_ci_parser.add_argument("--alpha", type=float, default=0.05)
+    avalanche_bit_ci_parser.set_defaults(ci_level=0.95, func=run_avalanche_bit_ci)
 
     distinguish_parser = subparsers.add_parser("distinguish")
     add_common_rounds(distinguish_parser)

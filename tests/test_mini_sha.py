@@ -9,14 +9,18 @@ from src.hash_lab.experiments import (
     avalanche_ratios,
     bit_avalanche,
     bootstrap_mean_ci,
+    baseline_normal_p_value,
     distinguish,
     flip_one_bit,
     hamming_distance,
     hierarchical_bootstrap_mean_ci,
+    holm_adjusted_p_values,
     majority_baseline_accuracy,
     percentile,
+    read_bit_metrics,
     read_per_sample_ratios,
     save_results,
+    wilson_score_ci,
 )
 from src.hash_lab.mini_sha import digest, digest_bits, pad_block
 
@@ -92,6 +96,42 @@ class MiniShaTests(unittest.TestCase):
             self.assertEqual(grouped[4][2], [0.25])
         finally:
             output.unlink(missing_ok=True)
+
+    def test_read_bit_metrics_aggregates_seeds(self):
+        output = Path("results/test-bit-metrics.csv")
+        try:
+            output.write_text(
+                "rounds,seed,samples,output_bit_index,flip_count,flip_rate\n"
+                "4,1,10,0,6,0.600000\n"
+                "4,2,10,0,4,0.400000\n"
+                "4,1,10,1,7,0.700000\n",
+                encoding="utf-8",
+            )
+
+            grouped = read_bit_metrics(output)
+
+            self.assertEqual(grouped[4][0], {"flips": 10, "samples": 20})
+            self.assertEqual(grouped[4][1], {"flips": 7, "samples": 10})
+        finally:
+            output.unlink(missing_ok=True)
+
+    def test_wilson_score_ci_bounds_rate(self):
+        low, high = wilson_score_ci(50, 100)
+
+        self.assertLess(low, 0.5)
+        self.assertGreater(high, 0.5)
+
+    def test_baseline_normal_p_value_is_larger_near_baseline(self):
+        near = baseline_normal_p_value(50, 100)
+        far = baseline_normal_p_value(80, 100)
+
+        self.assertGreater(near, far)
+
+    def test_holm_adjusted_p_values_are_monotone_by_rank(self):
+        adjusted = holm_adjusted_p_values([0.03, 0.001, 0.02])
+
+        self.assertEqual(len(adjusted), 3)
+        self.assertGreaterEqual(adjusted[2], adjusted[1])
 
     def test_majority_baseline_accuracy(self):
         rows = [([0], 1), ([1], 1), ([0], 0), ([1], 1)]
