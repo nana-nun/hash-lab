@@ -1,0 +1,40 @@
+{
+  "experiment": "distinguish",
+  "issue": 15,
+  "command": ".\\.venv\\Scripts\\python.exe -c \"<inline script>\"",
+  "executed_at": "2026-05-09T22:22:46+09:00",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "hash": "mini-sha",
+  "rounds": [
+    2,
+    4,
+    8,
+    16
+  ],
+  "dataset_size": {
+    "samples_per_class_per_seed": 1000,
+    "total_rows_per_seed_round": 2000,
+    "train_fraction": 0.8,
+    "test_fraction": 0.2
+  },
+  "model_config": {
+    "model": "logistic regression",
+    "epochs": 8,
+    "learning_rate": 0.08,
+    "features": 256
+  },
+  "baselines": {
+    "random_guess_accuracy": 0.5,
+    "majority_baseline": "computed from each shuffled test split"
+  },
+  "metrics_files": [
+    "seed_metrics.csv",
+    "aggregate_metrics.csv"
+  ]
+}
