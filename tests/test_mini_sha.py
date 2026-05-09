@@ -12,8 +12,10 @@ from src.hash_lab.experiments import (
     distinguish,
     flip_one_bit,
     hamming_distance,
+    hierarchical_bootstrap_mean_ci,
     majority_baseline_accuracy,
     percentile,
+    read_per_sample_ratios,
     save_results,
 )
 from src.hash_lab.mini_sha import digest, digest_bits, pad_block
@@ -65,6 +67,31 @@ class MiniShaTests(unittest.TestCase):
 
         self.assertEqual(left, right)
         self.assertLessEqual(left[0], left[1])
+
+    def test_hierarchical_bootstrap_mean_ci_is_reproducible(self):
+        values_by_seed = {1: [0.0, 0.25], 2: [0.75, 1.0]}
+        left = hierarchical_bootstrap_mean_ci(values_by_seed, iterations=20, seed=5)
+        right = hierarchical_bootstrap_mean_ci(values_by_seed, iterations=20, seed=5)
+
+        self.assertEqual(left, right)
+        self.assertLessEqual(left[0], left[1])
+
+    def test_read_per_sample_ratios_groups_by_round_and_seed(self):
+        output = Path("results/test-per-sample-ratios.csv")
+        try:
+            output.write_text(
+                "experiment,rounds,seed,sample_index,flip_ratio\n"
+                "avalanche_bootstrap,4,1,0,0.12500000\n"
+                "avalanche_bootstrap,4,2,0,0.25000000\n",
+                encoding="utf-8",
+            )
+
+            grouped = read_per_sample_ratios(output)
+
+            self.assertEqual(grouped[4][1], [0.125])
+            self.assertEqual(grouped[4][2], [0.25])
+        finally:
+            output.unlink(missing_ok=True)
 
     def test_majority_baseline_accuracy(self):
         rows = [([0], 1), ([1], 1), ([0], 0), ([1], 1)]

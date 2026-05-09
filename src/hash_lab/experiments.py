@@ -7,6 +7,7 @@ import csv
 import json
 import math
 import random
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -198,6 +199,52 @@ def bootstrap_mean_ci(
     means.sort()
     tail = (1 - ci_level) / 2
     return percentile(means, tail), percentile(means, 1 - tail)
+
+
+def hierarchical_bootstrap_mean_ci(
+    values_by_seed: dict[int, list[float]],
+    iterations: int = 2000,
+    ci_level: float = 0.95,
+    seed: int = 1,
+) -> tuple[float, float]:
+    if not values_by_seed:
+        raise ValueError("values_by_seed must not be empty")
+    if iterations < 1:
+        raise ValueError("iterations must be positive")
+    if ci_level <= 0 or ci_level >= 1:
+        raise ValueError("ci_level must be between 0 and 1")
+
+    rng = random.Random(seed)
+    seed_ids = sorted(values_by_seed)
+    means: list[float] = []
+    for _ in range(iterations):
+        total = 0.0
+        count = 0
+        for _ in seed_ids:
+            seed_values = values_by_seed[rng.choice(seed_ids)]
+            sample_size = len(seed_values)
+            for _ in range(sample_size):
+                total += seed_values[rng.randrange(sample_size)]
+            count += sample_size
+        means.append(total / count)
+
+    means.sort()
+    tail = (1 - ci_level) / 2
+    return percentile(means, tail), percentile(means, 1 - tail)
+
+
+def read_per_sample_ratios(path: Path) -> dict[int, dict[int, list[float]]]:
+    values: dict[int, dict[int, list[float]]] = defaultdict(lambda: defaultdict(list))
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            values[int(row["rounds"])][int(row["seed"])].append(float(row["flip_ratio"]))
+    return {rounds: dict(seeds) for rounds, seeds in values.items()}
+
+
+def read_metrics_by_round(path: Path) -> dict[int, dict[str, str]]:
+    with path.open(newline="", encoding="utf-8") as handle:
+        return {int(row["rounds"]): row for row in csv.DictReader(handle)}
 
 
 def sigmoid(x: float) -> float:
@@ -523,6 +570,87 @@ def run_avalanche_bits(args: argparse.Namespace) -> None:
     write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
 
 
+def run_avalanche_seed_bootstrap(args: argparse.Namespace) -> None:
+    ratios_by_round = read_per_sample_ratios(args.samples_input)
+    per_sample_metrics = (
+        read_metrics_by_round(args.per_sample_metrics) if args.per_sample_metrics is not None else {}
+    )
+    summary_rows: list[dict[str, object]] = []
+
+    for rounds in args.rounds:
+        values_by_seed = ratios_by_round[rounds]
+        all_ratios = [ratio for ratios in values_by_seed.values() for ratio in ratios]
+        result = summarize_ratios(rounds, all_ratios)
+        ci_low, ci_high = hierarchical_bootstrap_mean_ci(
+            values_by_seed,
+            iterations=args.bootstrap_iterations,
+            ci_level=args.ci_level,
+            seed=args.bootstrap_seed + rounds,
+        )
+        per_sample = per_sample_metrics.get(rounds, {})
+        per_sample_ci_low = per_sample.get("ci_low", "")
+        per_sample_ci_high = per_sample.get("ci_high", "")
+        row = {
+            "rounds": rounds,
+            "seeds": len(values_by_seed),
+            "samples_per_seed": min(len(ratios) for ratios in values_by_seed.values()),
+            "total_samples": len(all_ratios),
+            "baseline": f"{args.baseline:.6f}",
+            "mean": f"{result.mean:.6f}",
+            "ci_level": f"{args.ci_level:.6f}",
+            "ci_method": "hierarchical_seed_percentile_bootstrap",
+            "bootstrap_iterations": args.bootstrap_iterations,
+            "bootstrap_seed": args.bootstrap_seed + rounds,
+            "ci_low": f"{ci_low:.6f}",
+            "ci_high": f"{ci_high:.6f}",
+            "baseline_delta": f"{result.mean - args.baseline:.6f}",
+            "baseline_delta_ci_low": f"{ci_low - args.baseline:.6f}",
+            "baseline_delta_ci_high": f"{ci_high - args.baseline:.6f}",
+            "ci_contains_baseline": ci_low <= args.baseline <= ci_high,
+            "per_sample_ci_low": per_sample_ci_low,
+            "per_sample_ci_high": per_sample_ci_high,
+            "ci_low_minus_per_sample": (
+                f"{ci_low - float(per_sample_ci_low):.6f}" if per_sample_ci_low else ""
+            ),
+            "ci_high_minus_per_sample": (
+                f"{ci_high - float(per_sample_ci_high):.6f}" if per_sample_ci_high else ""
+            ),
+            "min": f"{result.minimum:.6f}",
+            "max": f"{result.maximum:.6f}",
+        }
+        summary_rows.append(row)
+
+    fieldnames = [
+        "rounds",
+        "seeds",
+        "samples_per_seed",
+        "total_samples",
+        "baseline",
+        "mean",
+        "ci_level",
+        "ci_method",
+        "bootstrap_iterations",
+        "bootstrap_seed",
+        "ci_low",
+        "ci_high",
+        "baseline_delta",
+        "baseline_delta_ci_low",
+        "baseline_delta_ci_high",
+        "ci_contains_baseline",
+        "per_sample_ci_low",
+        "per_sample_ci_high",
+        "ci_low_minus_per_sample",
+        "ci_high_minus_per_sample",
+        "min",
+        "max",
+    ]
+    print(",".join(fieldnames))
+    for row in summary_rows:
+        print(",".join(str(row[field]) for field in fieldnames))
+
+    write_rows_csv(args.summary_output, fieldnames, summary_rows)
+
+
 def run_distinguish(args: argparse.Namespace) -> None:
     print(
         "rounds,samples,epochs,random_guess_baseline,majority_baseline,"
@@ -606,6 +734,17 @@ def build_parser() -> argparse.ArgumentParser:
     avalanche_bits_parser.add_argument("--output-bytes", type=int, default=32)
     avalanche_bits_parser.add_argument("--baseline", type=float, default=0.5)
     avalanche_bits_parser.set_defaults(func=run_avalanche_bits)
+
+    avalanche_seed_bootstrap_parser = subparsers.add_parser("avalanche-seed-bootstrap")
+    avalanche_seed_bootstrap_parser.add_argument("--rounds", nargs="+", type=int, required=True)
+    avalanche_seed_bootstrap_parser.add_argument("--samples-input", type=Path, required=True)
+    avalanche_seed_bootstrap_parser.add_argument("--summary-output", type=Path, required=True)
+    avalanche_seed_bootstrap_parser.add_argument("--per-sample-metrics", type=Path)
+    avalanche_seed_bootstrap_parser.add_argument("--bootstrap-iterations", type=int, default=2000)
+    avalanche_seed_bootstrap_parser.add_argument("--bootstrap-seed", type=int, default=20260510)
+    avalanche_seed_bootstrap_parser.add_argument("--ci-level", type=float, default=0.95)
+    avalanche_seed_bootstrap_parser.add_argument("--baseline", type=float, default=0.5)
+    avalanche_seed_bootstrap_parser.set_defaults(func=run_avalanche_seed_bootstrap)
 
     distinguish_parser = subparsers.add_parser("distinguish")
     add_common_rounds(distinguish_parser)

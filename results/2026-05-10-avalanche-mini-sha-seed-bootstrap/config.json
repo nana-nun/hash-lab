@@ -1,0 +1,20 @@
+{
+  "experiment": "avalanche_seed_bootstrap",
+  "executed_at": "2026-05-10T00:58:57+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m src.hash_lab.cli avalanche-seed-bootstrap --rounds 2 4 8 16 32 --samples-input results/2026-05-10-avalanche-mini-sha-bootstrap/per_sample_flip_ratios.csv --per-sample-metrics results/2026-05-10-avalanche-mini-sha-bootstrap/bootstrap_metrics.csv --bootstrap-iterations 2000 --bootstrap-seed 20260510 --summary-output results/2026-05-10-avalanche-mini-sha-seed-bootstrap/seed_bootstrap_metrics.csv",
+  "input": {
+    "per_sample_ratios": "results/2026-05-10-avalanche-mini-sha-bootstrap/per_sample_flip_ratios.csv",
+    "per_sample_metrics": "results/2026-05-10-avalanche-mini-sha-bootstrap/bootstrap_metrics.csv"
+  },
+  "hash": "mini-sha",
+  "rounds": [2, 4, 8, 16, 32],
+  "seeds": [1, 2, 3, 4, 5],
+  "samples_per_seed": 2000,
+  "total_samples_per_round": 10000,
+  "baseline": 0.5,
+  "ci_level": 0.95,
+  "ci_method": "hierarchical_seed_percentile_bootstrap",
+  "bootstrap_iterations": 2000,
+  "bootstrap_seed_base": 20260510,
+  "model_config": null
+}
