@@ -1,0 +1,25 @@
+{
+  "experiment": "avalanche_rounds_9_15",
+  "executed_at": "2026-05-10T02:03:58+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe - <<inline script>>",
+  "hash": "mini-sha",
+  "rounds": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "samples_per_seed": 2000,
+  "baseline": 0.5,
+  "model_config": null
+}

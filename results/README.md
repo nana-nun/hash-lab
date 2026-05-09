@@ -8,6 +8,7 @@
 | --- | --- | --- | --- |
 | `2026-05-09-avalanche-mini-sha/` | avalanche | `metrics.csv`, `notes.md` | `mini-sha` の single-seed avalanche 初期測定。round 数が増えるほど mean flip ratio が `0.5` に近づく傾向を確認。 |
 | `2026-05-09-avalanche-mini-sha-multi-seed/` | avalanche | `seed_metrics.csv`, `aggregate_metrics.csv`, `notes.md` | seeds `1..5`、各round `2000 samples`。16/32 rounds は複数seedでも `0.5` 付近。 |
+| `2026-05-10-avalanche-mini-sha-rounds-9-15/` | avalanche | `seed_metrics.csv`, `aggregate_metrics.csv`, `config.json`, `notes.md` | 9-15 rounds の中間領域を測定。12 rounds は `0.493620`、13 rounds 以降は `0.5` 付近で、主な境界は12から13 rounds の間に見える。 |
 | `2026-05-09-avalanche-mini-sha-uncertainty/` | avalanche uncertainty | `uncertainty_metrics.csv`, `config.json`, `notes.md` | seed mean から標準誤差と簡易95% t区間を計算。2/4/8 rounds は baseline `0.5` を含まず、16/32 rounds は含む。 |
 | `2026-05-10-avalanche-mini-sha-bootstrap/` | avalanche uncertainty | `per_sample_flip_ratios.csv`, `bootstrap_metrics.csv`, `config.json`, `notes.md` | per-sample flip ratio を保存し、percentile bootstrap 95% CI を計算。2/4/8 rounds は baseline `0.5` を含まず、16/32 rounds は含む。 |
 | `2026-05-10-avalanche-mini-sha-bit-positions/` | avalanche bit positions | `bit_metrics.csv`, `round_summary.csv`, `config.json`, `notes.md` | 出力bit位置ごとの flip rate を測定。2/4/8 rounds はbit別にも大きく偏り、16/32 rounds は aggregate min/max も `0.5` 付近。 |
