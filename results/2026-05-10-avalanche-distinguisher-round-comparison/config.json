@@ -1,0 +1,54 @@
+{
+  "experiment": "avalanche_distinguisher_round_comparison",
+  "issue": 19,
+  "executed_at": "2026-05-10T21:18:29+09:00",
+  "command": "$env:PYTHONPATH=\"src\"; .\\.venv\\Scripts\\python.exe -c \"<inline script>\"",
+  "hash": "mini-sha",
+  "rounds": [
+    2,
+    4,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    32
+  ],
+  "baselines": {
+    "avalanche_mean_flip_ratio": 0.5,
+    "bit_position_flip_rate": 0.5,
+    "distinguisher_random_guess_accuracy": 0.5
+  },
+  "distinguisher_condition": {
+    "source": "results\\2026-05-09-distinguish-baseline-multi-seed\\aggregate_metrics.csv",
+    "model": "logistic regression",
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "samples_per_seed": 1000,
+    "epochs": 8
+  },
+  "sources": {
+    "avalanche_2_4_8_16_32": "results\\2026-05-09-avalanche-mini-sha-multi-seed\\aggregate_metrics.csv",
+    "avalanche_9_15": "results\\2026-05-10-avalanche-mini-sha-rounds-9-15\\aggregate_metrics.csv",
+    "bit_positions_2_4_8_16_32": "results\\2026-05-10-avalanche-mini-sha-bit-positions\\round_summary.csv",
+    "bit_positions_9_15": "results\\2026-05-10-avalanche-mini-sha-bit-positions-9-15\\round_summary.csv",
+    "bit_ci_2_4_8_16_32": "results\\2026-05-10-avalanche-mini-sha-bit-ci\\round_summary.csv",
+    "bit_ci_9_15": "results\\2026-05-10-avalanche-mini-sha-bit-ci-9-15\\round_summary.csv",
+    "distinguisher_multi_seed": "results\\2026-05-09-distinguish-baseline-multi-seed\\aggregate_metrics.csv",
+    "distinguisher_sensitivity": "results\\2026-05-10-distinguish-size-epochs-sensitivity\\aggregate_metrics.csv"
+  },
+  "outputs": [
+    "round_comparison.csv",
+    "config.json",
+    "notes.md"
+  ]
+}
