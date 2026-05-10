@@ -1,0 +1,22 @@
+{
+  "experiment": "avalanche_13_bit255_extra_seeds",
+  "commands": [
+    "C:\\Users\\nanau\\source\\hash-lab\\.venv\\Scripts\\python.exe -m src.hash_lab.cli avalanche-bits --rounds 12 13 14 --samples 2000 --seeds 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 --bit-output results/2026-05-10-avalanche-mini-sha-13-bit255-extra-seeds/bit_metrics.csv --summary-output results/2026-05-10-avalanche-mini-sha-13-bit255-extra-seeds/round_summary.csv",
+    "C:\\Users\\nanau\\source\\hash-lab\\.venv\\Scripts\\python.exe -m src.hash_lab.cli avalanche-bit-ci --rounds 12 13 14 --bit-input results/2026-05-10-avalanche-mini-sha-13-bit255-extra-seeds/bit_metrics.csv --bit-ci-output results/2026-05-10-avalanche-mini-sha-13-bit255-extra-seeds/bit_ci_metrics.csv --summary-output results/2026-05-10-avalanche-mini-sha-13-bit255-extra-seeds/bit_ci_summary.csv"
+  ],
+  "executed_at": "2026-05-10T10:11:31+09:00",
+  "hash": "mini-sha",
+  "rounds": [12, 13, 14],
+  "seeds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+  "samples_per_seed": 2000,
+  "total_samples_per_round": 40000,
+  "total_samples_per_round_bit": 40000,
+  "output_bits": 256,
+  "baseline": 0.5,
+  "ci_method": "wilson_score",
+  "ci_level": 0.95,
+  "p_value_method": "normal_approximation_two_sided",
+  "multiple_comparison_method": "holm",
+  "alpha": 0.05,
+  "model_config": null
+}
