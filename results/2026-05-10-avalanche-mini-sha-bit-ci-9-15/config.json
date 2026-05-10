@@ -1,0 +1,19 @@
+{
+  "experiment": "avalanche_bit_ci_9_15",
+  "command": "C:\\Users\\nanau\\source\\hash-lab\\.venv\\Scripts\\python.exe -m src.hash_lab.cli avalanche-bit-ci --rounds 9 10 11 12 13 14 15 --bit-input results/2026-05-10-avalanche-mini-sha-bit-positions-9-15/bit_metrics.csv --bit-ci-output results/2026-05-10-avalanche-mini-sha-bit-ci-9-15/bit_ci_metrics.csv --summary-output results/2026-05-10-avalanche-mini-sha-bit-ci-9-15/round_summary.csv",
+  "executed_at": "2026-05-10T09:53:59+09:00",
+  "input": "results/2026-05-10-avalanche-mini-sha-bit-positions-9-15/bit_metrics.csv",
+  "hash": "mini-sha",
+  "rounds": [9, 10, 11, 12, 13, 14, 15],
+  "seeds": [1, 2, 3, 4, 5],
+  "samples_per_seed": 2000,
+  "total_samples_per_round_bit": 10000,
+  "output_bits": 256,
+  "baseline": 0.5,
+  "ci_method": "wilson_score",
+  "ci_level": 0.95,
+  "p_value_method": "normal_approximation_two_sided",
+  "multiple_comparison_method": "holm",
+  "alpha": 0.05,
+  "model_config": null
+}
