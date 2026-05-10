@@ -44,7 +44,7 @@ Use this skill for one GitHub Issue at a time in the `hash-lab` repository.
 ## Common Blockers
 
 - `proxyconnect tcp ... 127.0.0.1:9 ... actively refused`: retry the same `gh` or networked `git` command through the approved/escalated execution path. This is an environment proxy blocker, not an Issue-level research result.
-- `.git/index.lock` or `.git/ORIG_HEAD.lock` `Permission denied`: retry the same git operation through the approved/escalated execution path. Do not remove lock files unless the user explicitly asks and the path is verified.
+- `.git/index.lock` or `.git/ORIG_HEAD.lock` `Permission denied`: in this Codex environment, `.git` may have sandbox-related Deny ACLs. Run `.git`-writing Git commands through the approved/escalated execution path from the start: `git fetch`, `git switch`, `git merge`, `git add`, `git commit`, and `git push`. Read-only commands such as `git status`, `git diff`, `git log`, and `git show` can run normally. Do not remove lock files unless the user explicitly asks and the path is verified.
 - `ModuleNotFoundError: No module named 'hash_lab'`: set `PYTHONPATH=src` for the command, then rerun.
 
 ## Experiment Notes

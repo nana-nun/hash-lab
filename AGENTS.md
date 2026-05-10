@@ -123,7 +123,7 @@ python -m unittest discover -s tests
 ## Operational Notes
 
 - Codex環境では、sandbox内のネットワークが `127.0.0.1:9` proxy に向いて `proxyconnect tcp ... actively refused` で失敗することがある。その場合は同じ `gh ...` / `git fetch` / `git push` 操作を権限付きで再実行し、必要に応じて環境設定で proxy 変数が解除されているか確認する。
-- `.git/index.lock` や `.git/ORIG_HEAD.lock` を作れず `Permission denied` になる場合は、作業内容の問題ではなく `.git` への書き込み権限で止まっている可能性が高い。`git add`、`git merge`、`git commit` など必要なgit操作を権限付きで再実行する。
+- Codex環境では `.git` 配下に sandbox 由来の Deny ACL があり、通常権限のGitが `.git/index.lock` や `.git/ORIG_HEAD.lock` を作れないことがある。`git fetch`、`git switch`、`git merge`、`git add`、`git commit`、`git push` のような `.git` に書き込むGit操作は、失敗を待たず最初から権限付きで実行してよい。`git status`、`git diff`、`git log`、`git show` のような読み取り操作は通常実行でよい。
 - `.codex/environments/environment.toml` は自動生成ファイルなので、手で変える場合は今回の詰まりを防ぐための最小限に留め、変更理由をPRまたは最終応答に残す。
 
 ## Change Policy
