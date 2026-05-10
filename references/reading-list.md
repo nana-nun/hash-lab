@@ -38,6 +38,22 @@
   - BibTeX: `upadhyay_avalanche_2022`
   - Note: `references/notes/upadhyay-avalanche-2022.md`
   - 複数の実ハッシュ関数と hash-based application で avalanche / SAC / BIC / randomness tests を測った実験研究。hash-lab の測定項目を増やすときの比較対象。
+- Lawrence E. Bassham et al., *A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications*, NIST SP 800-22 Rev. 1a, 2010.
+  - BibTeX: `nist_sp800_22r1a_2010`
+  - Note: `references/notes/randomness-tests-low-order-statistics.md`
+  - frequency、runs、serial、approximate entropy などの統計test候補を整理する基準文献。hash-lab では合格/不合格を安全性の証明にせず、toy hash の低次統計baseline候補として読む。
+- Pierre L'Ecuyer and Richard Simard, *TestU01: A C Library for Empirical Testing of Random Number Generators*, 2007.
+  - BibTeX: `lecuyer_testu01_2007`
+  - Note: `references/notes/randomness-tests-low-order-statistics.md`
+  - RNG empirical testing の大きなtest batteryと分類の文献。hash-lab ではまず小さなfrequency/runs/correlationから始め、必要なら大規模batteryとの対応を見る。
+- George Marsaglia and Wai Wan Tsang, *Some Difficult-to-Pass Tests of Randomness*, 2002.
+  - BibTeX: `marsaglia_difficult_2002`
+  - Note: `references/notes/randomness-tests-low-order-statistics.md`
+  - GCD、birthday spacing、Gorilla test など、単純な統計では拾いにくい偏りを探す発想の参考。hash-lab の初期実装では過剰に重くしない。
+- Meltem Sönmez Turan et al., *Recommendation for the Entropy Sources Used for Random Bit Generation*, NIST SP 800-90B, 2018.
+  - BibTeX: `nist_sp800_90b_2018`
+  - Note: `references/notes/randomness-tests-low-order-statistics.md`
+  - entropy source validation と health tests の文献。hash-lab のhash出力評価そのものではないが、「統計testは安全性証明ではない」という注意を補強する背景。
 
 ## Core: Neural Cryptanalysis and Machine Learning
 
