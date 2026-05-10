@@ -89,10 +89,14 @@ results/
   - `gh issue view <number> --repo nana-nun/hash-lab`
   - `gh project view 2 --owner "@me" --format json`
   - `gh project item-list 2 --owner "@me" --format json --limit 100`
+  - `gh project field-list 2 --owner "@me" --format json`
+  - `gh project item-edit --project-id <project-id> --id <item-id> --field-id <status-field-id> --single-select-option-id <option-id>`
   - `gh issue create --repo nana-nun/hash-lab --title "<title>" --label "t:exp" --body "<body>"`
   - `gh pr create --repo nana-nun/hash-lab --base master --head <branch> --title "<title>" --body "<body>"`
 - Issueは `t:exp`、`t:ref`、`t:impl`、`t:docs`、`t:maint` のいずれかを基本分類にする。
 - Issueラベルは基本分類の `t:*` と優先度の `p:*` を使い、進行状況は GitHub Projects の `Status` で管理する。新規Issueに `s:*` ラベルは付けない。
+- AIエージェントがIssueを担当するときは、claimコメントを書いた後、実装前に GitHub Projects の `Status` を `In Progress` に変更し、変更後の状態が見えることを確認する。Status更新または確認ができない場合は、ファイル変更や実装に進まず停止して報告する。
+- PR作成後は、可能なら GitHub Projects の `Status` を `Review` に変更し、変更できない場合はPRまたは最終応答にその理由を残す。
 - 実装前に関連Issueを確認し、完了後にテスト結果、実験結果、制限、残課題をIssueまたは最終応答に残す。
 - 実装ブランチを切る前に `git fetch origin` し、原則として最新の `origin/main` から開始する。
 - 未マージPRの成果物に依存するIssueは、そのPRブランチから派生し、PR本文に依存関係を書く。

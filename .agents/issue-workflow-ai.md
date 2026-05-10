@@ -47,9 +47,16 @@ When project access is available, check the project before implementation and ag
 ```powershell
 gh project view 2 --owner "@me" --format json
 gh project item-list 2 --owner "@me" --format json --limit 100
+gh project field-list 2 --owner "@me" --format json
 ```
 
 Use the project `Status` field for workflow state such as `Todo`, `Ready`, `In Progress`, `Review`, `Done`, or `Blocked` when those options exist. Keep Issue labels for type (`t:*`) and priority (`p:*`). Do not create new `s:*` labels.
+
+When an AI agent claims an Issue, the claim is not complete until the GitHub Projects `Status` is updated from `Todo` or `Ready` to `In Progress` and then verified. Do this before creating files, running experiments, or implementing code. If the status update or verification fails, stop without implementation and report the blocker.
+
+When a PR is opened for an Issue, update the GitHub Projects `Status` to `Review` when the option exists. If that update fails, leave a clear note in the PR or final response.
+
+Use `gh project item-edit` with the project item id, the `Status` field id, and the target single-select option id discovered from `gh project item-list` and `gh project field-list`. After editing, rerun `gh issue view <number> --repo nana-nun/hash-lab --json projectItems` or `gh project item-list ...` and confirm the visible status changed.
 
 If `gh project ...` fails because the token is missing `read:project`, ask the user to run:
 
@@ -106,6 +113,7 @@ For reference Issues, capture URL, book title, paper title, authors, year, DOI, 
 ## Implementing Issues
 
 - Check the Issue's GitHub Projects `Status` when available. If it is not `Ready`, `Todo`, or otherwise clearly available for work, mention the mismatch before proceeding.
+- After writing the claim comment, update the Issue's GitHub Projects `Status` to `In Progress` and verify the updated status is visible. Do not implement if the Issue remains `Todo` or `Ready`.
 - Before creating an implementation branch, run `git fetch origin` and start from the latest `origin/main`.
 - If the Issue depends on an unmerged PR, branch from that PR branch and mention the dependency in the PR body.
 - Avoid sibling PRs from stale `main` when changing shared files such as `docs/research-state.md`, `results/README.md`, or `src/hash_lab/experiments.py`; these files are frequent conflict points.
@@ -117,6 +125,7 @@ For reference Issues, capture URL, book title, paper title, authors, year, DOI, 
 - Update `docs/research-state.md` when a completed experiment or reference task changes the current interpretation of the project.
 - Run the relevant test or CLI sample before finishing.
 - Before opening a PR, fetch and merge or rebase the latest `origin/main`, resolve conflicts locally, and rerun verification.
+- After opening a PR, update the Issue's GitHub Projects `Status` to `Review` when possible and verify or report the blocker.
 - Report changed files, verification, GitHub Projects status observations, and remaining limitations in the Issue or final response.
 
 ## Label Skills
