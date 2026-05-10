@@ -18,6 +18,8 @@ from src.hash_lab.experiments import (
     majority_baseline_accuracy,
     percentile,
     read_bit_metrics,
+    read_bit_metrics_by_seed,
+    read_metrics_by_round_and_bit,
     read_per_sample_ratios,
     save_results,
     wilson_score_ci,
@@ -112,6 +114,42 @@ class MiniShaTests(unittest.TestCase):
 
             self.assertEqual(grouped[4][0], {"flips": 10, "samples": 20})
             self.assertEqual(grouped[4][1], {"flips": 7, "samples": 10})
+        finally:
+            output.unlink(missing_ok=True)
+
+    def test_read_bit_metrics_by_seed_preserves_seed_buckets(self):
+        output = Path("results/test-bit-metrics-by-seed.csv")
+        try:
+            output.write_text(
+                "rounds,seed,samples,output_bit_index,flip_count,flip_rate\n"
+                "13,1,10,255,4,0.400000\n"
+                "13,2,10,255,6,0.600000\n"
+                "13,1,10,254,5,0.500000\n",
+                encoding="utf-8",
+            )
+
+            grouped = read_bit_metrics_by_seed(output)
+
+            self.assertEqual(grouped[13][255][1], {"flips": 4, "samples": 10})
+            self.assertEqual(grouped[13][255][2], {"flips": 6, "samples": 10})
+            self.assertEqual(grouped[13][254][1], {"flips": 5, "samples": 10})
+        finally:
+            output.unlink(missing_ok=True)
+
+    def test_read_metrics_by_round_and_bit_keys_by_both_columns(self):
+        output = Path("results/test-round-bit-metrics.csv")
+        try:
+            output.write_text(
+                "rounds,output_bit_index,ci_low,ci_high\n"
+                "13,254,0.490000,0.510000\n"
+                "13,255,0.480000,0.490000\n",
+                encoding="utf-8",
+            )
+
+            grouped = read_metrics_by_round_and_bit(output)
+
+            self.assertEqual(grouped[(13, 255)]["ci_low"], "0.480000")
+            self.assertEqual(grouped[(13, 254)]["ci_high"], "0.510000")
         finally:
             output.unlink(missing_ok=True)
 

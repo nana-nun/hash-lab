@@ -247,6 +247,14 @@ def read_metrics_by_round(path: Path) -> dict[int, dict[str, str]]:
         return {int(row["rounds"]): row for row in csv.DictReader(handle)}
 
 
+def read_metrics_by_round_and_bit(path: Path) -> dict[tuple[int, int], dict[str, str]]:
+    with path.open(newline="", encoding="utf-8") as handle:
+        return {
+            (int(row["rounds"]), int(row["output_bit_index"])): row
+            for row in csv.DictReader(handle)
+        }
+
+
 def read_bit_metrics(path: Path) -> dict[int, dict[int, dict[str, int]]]:
     values: dict[int, dict[int, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: {"flips": 0, "samples": 0}))
     with path.open(newline="", encoding="utf-8") as handle:
@@ -256,6 +264,19 @@ def read_bit_metrics(path: Path) -> dict[int, dict[int, dict[str, int]]]:
             bucket["flips"] += int(row["flip_count"])
             bucket["samples"] += int(row["samples"])
     return {rounds: dict(bits) for rounds, bits in values.items()}
+
+
+def read_bit_metrics_by_seed(path: Path) -> dict[int, dict[int, dict[int, dict[str, int]]]]:
+    values: dict[int, dict[int, dict[int, dict[str, int]]]] = defaultdict(
+        lambda: defaultdict(lambda: defaultdict(lambda: {"flips": 0, "samples": 0}))
+    )
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            bucket = values[int(row["rounds"])][int(row["output_bit_index"])][int(row["seed"])]
+            bucket["flips"] += int(row["flip_count"])
+            bucket["samples"] += int(row["samples"])
+    return {rounds: {bit: dict(seeds) for bit, seeds in bits.items()} for rounds, bits in values.items()}
 
 
 def wilson_score_ci(successes: int, trials: int, z_score: float = 1.959963984540054) -> tuple[float, float]:
@@ -793,6 +814,119 @@ def run_avalanche_bit_ci(args: argparse.Namespace) -> None:
     write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
 
 
+def run_avalanche_bit_seed_ci(args: argparse.Namespace) -> None:
+    bits_by_round = read_bit_metrics_by_seed(args.bit_input)
+    pooled_metrics = (
+        read_metrics_by_round_and_bit(args.pooled_ci_input) if args.pooled_ci_input is not None else {}
+    )
+    seed_rows: list[dict[str, object]] = []
+    summary_rows: list[dict[str, object]] = []
+
+    for rounds in args.rounds:
+        for bit_index in args.output_bits:
+            values_by_seed = bits_by_round[rounds][bit_index]
+            seed_rates = []
+            total_flips = 0
+            total_samples = 0
+            for seed, values in sorted(values_by_seed.items()):
+                rate = values["flips"] / values["samples"]
+                seed_rates.append(rate)
+                total_flips += values["flips"]
+                total_samples += values["samples"]
+                seed_rows.append(
+                    {
+                        "rounds": rounds,
+                        "output_bit_index": bit_index,
+                        "seed": seed,
+                        "samples": values["samples"],
+                        "flip_count": values["flips"],
+                        "flip_rate": f"{rate:.6f}",
+                        "baseline_delta": f"{rate - args.baseline:.6f}",
+                    }
+                )
+
+            seed_mean = sum(seed_rates) / len(seed_rates)
+            ci_low, ci_high = bootstrap_mean_ci(
+                seed_rates,
+                iterations=args.bootstrap_iterations,
+                ci_level=args.ci_level,
+                seed=args.bootstrap_seed + rounds + bit_index,
+            )
+            pooled_rate = total_flips / total_samples
+            pooled = pooled_metrics.get((rounds, bit_index), {})
+            summary_rows.append(
+                {
+                    "rounds": rounds,
+                    "output_bit_index": bit_index,
+                    "seed_count": len(seed_rates),
+                    "samples_per_seed": min(values["samples"] for values in values_by_seed.values()),
+                    "total_samples": total_samples,
+                    "baseline": f"{args.baseline:.6f}",
+                    "pooled_flip_rate": f"{pooled_rate:.6f}",
+                    "seed_mean_flip_rate": f"{seed_mean:.6f}",
+                    "seed_min_flip_rate": f"{min(seed_rates):.6f}",
+                    "seed_max_flip_rate": f"{max(seed_rates):.6f}",
+                    "ci_level": f"{args.ci_level:.6f}",
+                    "ci_method": "seed_mean_percentile_bootstrap",
+                    "bootstrap_iterations": args.bootstrap_iterations,
+                    "bootstrap_seed": args.bootstrap_seed + rounds + bit_index,
+                    "ci_low": f"{ci_low:.6f}",
+                    "ci_high": f"{ci_high:.6f}",
+                    "baseline_delta": f"{seed_mean - args.baseline:.6f}",
+                    "baseline_delta_ci_low": f"{ci_low - args.baseline:.6f}",
+                    "baseline_delta_ci_high": f"{ci_high - args.baseline:.6f}",
+                    "ci_contains_baseline": ci_low <= args.baseline <= ci_high,
+                    "pooled_ci_method": pooled.get("ci_method", ""),
+                    "pooled_ci_low": pooled.get("ci_low", ""),
+                    "pooled_ci_high": pooled.get("ci_high", ""),
+                    "pooled_ci_contains_baseline": pooled.get("ci_contains_baseline", ""),
+                }
+            )
+
+    seed_fieldnames = [
+        "rounds",
+        "output_bit_index",
+        "seed",
+        "samples",
+        "flip_count",
+        "flip_rate",
+        "baseline_delta",
+    ]
+    summary_fieldnames = [
+        "rounds",
+        "output_bit_index",
+        "seed_count",
+        "samples_per_seed",
+        "total_samples",
+        "baseline",
+        "pooled_flip_rate",
+        "seed_mean_flip_rate",
+        "seed_min_flip_rate",
+        "seed_max_flip_rate",
+        "ci_level",
+        "ci_method",
+        "bootstrap_iterations",
+        "bootstrap_seed",
+        "ci_low",
+        "ci_high",
+        "baseline_delta",
+        "baseline_delta_ci_low",
+        "baseline_delta_ci_high",
+        "ci_contains_baseline",
+        "pooled_ci_method",
+        "pooled_ci_low",
+        "pooled_ci_high",
+        "pooled_ci_contains_baseline",
+    ]
+
+    print(",".join(summary_fieldnames))
+    for row in summary_rows:
+        print(",".join(str(row[field]) for field in summary_fieldnames))
+
+    write_rows_csv(args.seed_output, seed_fieldnames, seed_rows)
+    write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
+
+
 def run_distinguish(args: argparse.Namespace) -> None:
     print(
         "rounds,samples,epochs,random_guess_baseline,majority_baseline,"
@@ -896,6 +1030,19 @@ def build_parser() -> argparse.ArgumentParser:
     avalanche_bit_ci_parser.add_argument("--baseline", type=float, default=0.5)
     avalanche_bit_ci_parser.add_argument("--alpha", type=float, default=0.05)
     avalanche_bit_ci_parser.set_defaults(ci_level=0.95, func=run_avalanche_bit_ci)
+
+    avalanche_bit_seed_ci_parser = subparsers.add_parser("avalanche-bit-seed-ci")
+    avalanche_bit_seed_ci_parser.add_argument("--rounds", nargs="+", type=int, required=True)
+    avalanche_bit_seed_ci_parser.add_argument("--output-bits", nargs="+", type=int, required=True)
+    avalanche_bit_seed_ci_parser.add_argument("--bit-input", type=Path, required=True)
+    avalanche_bit_seed_ci_parser.add_argument("--seed-output", type=Path, required=True)
+    avalanche_bit_seed_ci_parser.add_argument("--summary-output", type=Path, required=True)
+    avalanche_bit_seed_ci_parser.add_argument("--pooled-ci-input", type=Path)
+    avalanche_bit_seed_ci_parser.add_argument("--bootstrap-iterations", type=int, default=2000)
+    avalanche_bit_seed_ci_parser.add_argument("--bootstrap-seed", type=int, default=20260510)
+    avalanche_bit_seed_ci_parser.add_argument("--ci-level", type=float, default=0.95)
+    avalanche_bit_seed_ci_parser.add_argument("--baseline", type=float, default=0.5)
+    avalanche_bit_seed_ci_parser.set_defaults(func=run_avalanche_bit_seed_ci)
 
     distinguish_parser = subparsers.add_parser("distinguish")
     add_common_rounds(distinguish_parser)
