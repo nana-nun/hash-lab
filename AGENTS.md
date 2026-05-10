@@ -95,6 +95,7 @@ results/
   - `gh pr create --repo nana-nun/hash-lab --base master --head <branch> --title "<title>" --body "<body>"`
 - Issueは `t:exp`、`t:ref`、`t:impl`、`t:docs`、`t:maint` のいずれかを基本分類にする。
 - Issueラベルは基本分類の `t:*` と優先度の `p:*` を使い、進行状況は GitHub Projects の `Status` で管理する。新規Issueに `s:*` ラベルは付けない。
+- 優先度は `p:0` = すぐ必要、`p:1` = 次にやる、`p:2` = 後でよい。迷う新規Issueは `p:2` から始め、ブロッカーや近い実験・実装の前提だけを `p:0` / `p:1` に上げる。詳しい基準は `docs/issue-workflow-human.md` と `.agents/issue-workflow-ai.md` を参照する。
 - AIエージェントがIssueを担当するときは、claimコメントを書いた後、実装前に GitHub Projects の `Status` を `In Progress` に変更し、変更後の状態が見えることを確認する。Status更新または確認ができない場合は、ファイル変更や実装に進まず停止して報告する。
 - PR作成後は、可能なら GitHub Projects の `Status` を `Review` に変更し、変更できない場合はPRまたは最終応答にその理由を残す。
 - 実装前に関連Issueを確認し、完了後にテスト結果、実験結果、制限、残課題をIssueまたは最終応答に残す。

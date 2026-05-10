@@ -36,6 +36,14 @@ Use at most one priority label:
 - `p:1`
 - `p:2`
 
+Priority labels guide work ordering:
+
+- Use `p:0` only for blockers, urgent correctness/reproducibility fixes, workflow failures that prevent current work, or safety/scope corrections.
+- Use `p:1` for work that should happen next because it unblocks or materially improves near-term experiments, implementation, review, or interpretation.
+- Use `p:2` for useful backlog work that does not block the current path. Default new Issues to `p:2` when urgency is unclear.
+
+When reviewing existing Issues, do not bulk-change priority mechanically. Read dependencies, referenced result files, related PRs, and current Project `Status` first. Keep `p:0` small enough that it means "do this before normal work". Prefer a small set of `p:1` Issues over marking the whole backlog as next.
+
 Do not add `s:*` status labels to new Issues. Use the GitHub Projects `Status` field for workflow state.
 
 ## GitHub Projects
