@@ -1,0 +1,42 @@
+{
+  "experiment": "distinguish_size_epochs_sensitivity",
+  "issue": 18,
+  "executed_at": "2026-05-10T21:00:25+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe -c \"<inline script>\"",
+  "hash": "mini-sha",
+  "rounds": [
+    2,
+    4,
+    8,
+    16
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "samples_values": [
+    500,
+    1000,
+    2000
+  ],
+  "epochs_values": [
+    4,
+    8,
+    16
+  ],
+  "random_guess_baseline": 0.5,
+  "model_config": {
+    "model": "logistic regression",
+    "learning_rate": 0.08,
+    "features": 256,
+    "train_split": 0.8
+  },
+  "outputs": [
+    "seed_metrics.csv",
+    "aggregate_metrics.csv",
+    "notes.md"
+  ]
+}
