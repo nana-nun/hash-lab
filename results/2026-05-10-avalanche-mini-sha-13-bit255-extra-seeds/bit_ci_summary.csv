@@ -1,0 +1,4 @@
+rounds,output_bits,total_samples_per_bit,baseline,alpha,min_flip_rate,max_flip_rate,max_abs_delta_from_baseline,holm_reject_count,ci_excludes_baseline_count
+12,256,40000,0.500000,0.050000,0.448125,0.507350,0.051875,67,101
+13,256,40000,0.500000,0.050000,0.483950,0.509025,0.016050,5,51
+14,256,40000,0.500000,0.050000,0.493450,0.506125,0.006550,0,17

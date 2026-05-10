@@ -1,0 +1,4 @@
+rounds,seeds,samples_per_seed,total_samples,output_bits,mean_flip_rate,min_flip_rate,min_bit_index,max_flip_rate,max_bit_index,max_abs_delta_from_baseline
+12,20,2000,40000,256,0.493308,0.448125,255,0.507350,67,0.051875
+13,20,2000,40000,256,0.499466,0.483950,255,0.509025,119,0.016050
+14,20,2000,40000,256,0.499940,0.493450,153,0.506125,168,0.006550
