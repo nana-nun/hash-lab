@@ -32,7 +32,7 @@ Use this skill for one GitHub Issue at a time in the `hash-lab` repository.
 11. Before creating the branch, synchronize the base with `git fetch origin` and start from the latest `origin/main` unless the Issue explicitly depends on an unmerged PR.
 12. If the Issue depends on an unmerged PR, branch from that PR branch and say so in the PR body. Do not create a sibling PR from stale `main` when it updates shared files such as `docs/research-state.md`, `results/README.md`, or `src/hash_lab/experiments.py`.
 13. Create a dedicated branch named `issue-<number>-<short-slug>`.
-14. Use the project `.venv` for Python commands. Create it only if missing.
+14. Use the project `.venv` for Python commands. Create it only if missing. When running `python -m hash_lab...` or inline scripts that import `hash_lab`, set `PYTHONPATH=src` first. If `ModuleNotFoundError: No module named 'hash_lab'` appears, retry once with `PYTHONPATH=src` before editing code.
 15. Make the smallest change that satisfies the Issue, using the label skill for output placement and verification details.
 16. Run the relevant tests, validation command, or CLI sample before finishing.
 17. Before committing or opening the PR, fetch and merge or rebase the latest `origin/main`, resolve conflicts locally, and rerun verification. Prefer fixing conflicts before the PR is created over leaving GitHub's "This branch has conflicts" state for the user.
@@ -40,6 +40,12 @@ Use this skill for one GitHub Issue at a time in the `hash-lab` repository.
 19. Commit the changes, push the branch, and create a PR with `gh pr create`.
 20. After opening the PR, update the GitHub Projects `Status` to `Review` when possible and verify it. If the update fails, record the reason in the PR or final response.
 21. Include the Issue closing keyword, changed files summary, verification commands, results, GitHub Projects status observations, limitations, created follow-up Issues, and remaining follow-ups in the PR body or final response.
+
+## Common Blockers
+
+- `proxyconnect tcp ... 127.0.0.1:9 ... actively refused`: retry the same `gh` or networked `git` command through the approved/escalated execution path. This is an environment proxy blocker, not an Issue-level research result.
+- `.git/index.lock` or `.git/ORIG_HEAD.lock` `Permission denied`: retry the same git operation through the approved/escalated execution path. Do not remove lock files unless the user explicitly asks and the path is verified.
+- `ModuleNotFoundError: No module named 'hash_lab'`: set `PYTHONPATH=src` for the command, then rerun.
 
 ## Experiment Notes
 

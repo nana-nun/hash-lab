@@ -39,6 +39,7 @@ Use `docs/experiment-log-template.md` and keep these sections separate:
 ## Verification
 
 - Run the exact CLI sample, script, or test that exercises the experiment path.
+- For inline experiment scripts that import repository modules, run from the repository root and set `PYTHONPATH=src` so `hash_lab` resolves consistently.
 - Record command, seed, target hash or rounds, dataset size, model config, metrics, and execution timestamp when results are saved.
 - Compare results against the baseline in the notes or final report.
 - Compare new interpretations against `docs/research-state.md`; update it when the current understanding changes.

@@ -107,6 +107,7 @@ results/
 
 - Pythonを動かす場合は、プロジェクト直下の `.venv` を使う。
 - `.venv` がない場合は作成してから使う。
+- `python -m hash_lab...` や inline script で `src/hash_lab` を import する場合は、PowerShellで `$env:PYTHONPATH="src"` を設定してから実行する。`ModuleNotFoundError: No module named 'hash_lab'` が出た場合は、まず `PYTHONPATH` の不足を疑う。
 - 依存パッケージを追加するときは、理由と用途をREADMEまたは関連ドキュメントに残す。
 
 PowerShell例:
@@ -114,8 +115,15 @@ PowerShell例:
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+$env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 ```
+
+## Operational Notes
+
+- Codex環境では、sandbox内のネットワークが `127.0.0.1:9` proxy に向いて `proxyconnect tcp ... actively refused` で失敗することがある。その場合は同じ `gh ...` / `git fetch` / `git push` 操作を権限付きで再実行し、必要に応じて環境設定で proxy 変数が解除されているか確認する。
+- `.git/index.lock` や `.git/ORIG_HEAD.lock` を作れず `Permission denied` になる場合は、作業内容の問題ではなく `.git` への書き込み権限で止まっている可能性が高い。`git add`、`git merge`、`git commit` など必要なgit操作を権限付きで再実行する。
+- `.codex/environments/environment.toml` は自動生成ファイルなので、手で変える場合は今回の詰まりを防ぐための最小限に留め、変更理由をPRまたは最終応答に残す。
 
 ## Change Policy
 
