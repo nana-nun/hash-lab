@@ -21,6 +21,7 @@
 | `2026-05-10-avalanche-mini-sha-seed-bootstrap/` | avalanche uncertainty | `seed_bootstrap_metrics.csv`, `config.json`, `notes.md` | seed階層を保つ percentile bootstrap 95% CI を計算。per-sample bootstrap より少し広いが、2/4/8 rounds は baseline `0.5` を含まず、16/32 rounds は含む。 |
 | `2026-05-09-distinguish-baseline/` | distinguisher | `metrics.csv`, `config.json`, `notes.md` | logistic regression の seed `1` baseline。2 rounds は識別可能、4/8/16 rounds は random guess 付近。 |
 | `2026-05-09-distinguish-baseline-multi-seed/` | distinguisher | `seed_metrics.csv`, `aggregate_metrics.csv`, `config.json`, `notes.md` | seeds `1..5` の distinguisher baseline。2 rounds は強く識別可能、4/8/16 rounds は平均で baseline 付近。 |
+| `2026-05-10-distinguish-size-epochs-sensitivity/` | distinguisher | `seed_metrics.csv`, `aggregate_metrics.csv`, `config.json`, `notes.md` | samples `500,1000,2000` と epochs `4,8,16` の感度測定。2 rounds は強く識別可能、4/8/16 rounds は平均で baseline 付近。 |
 
 ## Reading Order
 

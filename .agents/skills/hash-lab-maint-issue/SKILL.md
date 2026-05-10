@@ -24,7 +24,7 @@ Use this skill after `hash-lab-issue-runner` has confirmed the Issue, labels, br
 ## Verification
 
 - Run the smallest command that validates the maintenance change.
-- For skills, run `quick_validate.py` on each new or updated skill.
+- For skills, run `quick_validate.py` on each new or updated skill when that script exists in the repository; otherwise use `rg` and the relevant `.venv` command to verify paths, labels, and examples.
 - For workflow docs, use `rg` to confirm the documented labels, paths, or skill names exist.
 - For dependency or setup changes, verify commands inside the project `.venv` when Python is involved.
 
