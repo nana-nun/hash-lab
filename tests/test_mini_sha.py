@@ -15,12 +15,14 @@ from src.hash_lab.experiments import (
     hamming_distance,
     hierarchical_bootstrap_mean_ci,
     holm_adjusted_p_values,
+    low_order_stats,
     majority_baseline_accuracy,
     percentile,
     read_bit_metrics,
     read_bit_metrics_by_seed,
     read_metrics_by_round_and_bit,
     read_per_sample_ratios,
+    run_low_order_stats,
     save_results,
     wilson_score_ci,
 )
@@ -170,6 +172,55 @@ class MiniShaTests(unittest.TestCase):
 
         self.assertEqual(len(adjusted), 3)
         self.assertGreaterEqual(adjusted[2], adjusted[1])
+
+    def test_low_order_stats_reports_hash_and_random_sources(self):
+        results = low_order_stats(rounds=4, samples=3, seed=11, output_bytes=2, block_size=2)
+
+        self.assertEqual({result.source for result in results}, {"mini_sha", "random"})
+        for result in results:
+            self.assertEqual(result.samples, 3)
+            self.assertEqual(result.output_bits, 16)
+            self.assertEqual(result.bit_count, 48)
+            self.assertEqual(len(result.block_counts), 4)
+            self.assertEqual(result.total_blocks, 24)
+            self.assertTrue(0 <= result.ones_rate <= 1)
+            self.assertEqual(len(result.runs), 3)
+            self.assertEqual(len(result.longest_runs), 3)
+
+    def test_run_low_order_stats_writes_summary_and_block_csvs(self):
+        summary_output = Path("results/test-low-order-summary.csv")
+        block_output = Path("results/test-low-order-blocks.csv")
+        try:
+            summary_output.unlink(missing_ok=True)
+            block_output.unlink(missing_ok=True)
+            args = Namespace(
+                rounds=[4],
+                samples=2,
+                seeds=[1],
+                summary_output=summary_output,
+                block_output=block_output,
+                input_bytes=32,
+                output_bytes=2,
+                block_size=4,
+            )
+
+            run_low_order_stats(args)
+
+            with summary_output.open(newline="", encoding="utf-8") as handle:
+                summary_rows = list(csv.DictReader(handle))
+            with block_output.open(newline="", encoding="utf-8") as handle:
+                block_rows = list(csv.DictReader(handle))
+
+            self.assertEqual(len(summary_rows), 2)
+            self.assertEqual({row["source"] for row in summary_rows}, {"mini_sha", "random"})
+            self.assertEqual(summary_rows[0]["rounds"], "4")
+            self.assertEqual(summary_rows[0]["seed"], "1")
+            self.assertEqual(summary_rows[0]["samples"], "2")
+            self.assertEqual(len(block_rows), 32)
+            self.assertIn("block_rate_minus_uniform", block_rows[0])
+        finally:
+            summary_output.unlink(missing_ok=True)
+            block_output.unlink(missing_ok=True)
 
     def test_majority_baseline_accuracy(self):
         rows = [([0], 1), ([1], 1), ([0], 0), ([1], 1)]
