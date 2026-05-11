@@ -67,6 +67,41 @@ class BitAvalancheResult:
 
 
 @dataclass(frozen=True)
+class LowOrderStatsResult:
+    source: str
+    rounds: int
+    seed: int
+    samples: int
+    input_bytes: int
+    output_bits: int
+    block_size: int
+    ones_count: int
+    bit_count: int
+    runs: tuple[int, ...]
+    longest_runs: tuple[int, ...]
+    block_counts: tuple[int, ...]
+
+    @property
+    def ones_rate(self) -> float:
+        return self.ones_count / self.bit_count
+
+    @property
+    def zero_rate(self) -> float:
+        return 1 - self.ones_rate
+
+    @property
+    def total_blocks(self) -> int:
+        return sum(self.block_counts)
+
+    @property
+    def mean_runs(self) -> float:
+        return sum(self.runs) / len(self.runs)
+
+    @property
+    def mean_longest_run(self) -> float:
+        return sum(self.longest_runs) / len(self.longest_runs)
+
+@dataclass(frozen=True)
 class DistinguishResult:
     rounds: int
     samples: int
@@ -315,6 +350,112 @@ def holm_adjusted_p_values(p_values: list[float]) -> list[float]:
         running = max(running, min(1.0, (total - rank) * p_value))
         adjusted[index] = running
     return adjusted
+
+
+def count_runs(bits: list[int]) -> int:
+    if not bits:
+        return 0
+    runs = 1
+    previous = bits[0]
+    for bit in bits[1:]:
+        if bit != previous:
+            runs += 1
+            previous = bit
+    return runs
+
+
+def longest_run(bits: list[int]) -> int:
+    if not bits:
+        return 0
+    best = 1
+    current = 1
+    previous = bits[0]
+    for bit in bits[1:]:
+        if bit == previous:
+            current += 1
+        else:
+            best = max(best, current)
+            current = 1
+            previous = bit
+    return max(best, current)
+
+
+def block_value(bits: list[int]) -> int:
+    value = 0
+    for bit in bits:
+        value = (value << 1) | bit
+    return value
+
+
+def low_order_stats(
+    rounds: int,
+    samples: int,
+    seed: int = 1,
+    input_bytes: int = 32,
+    output_bytes: int = 32,
+    block_size: int = 4,
+) -> list[LowOrderStatsResult]:
+    if samples < 1:
+        raise ValueError("samples must be positive")
+    if input_bytes < 1 or input_bytes > 55:
+        raise ValueError("input_bytes must be between 1 and 55")
+    if block_size not in (2, 4):
+        raise ValueError("block_size must be 2 or 4")
+
+    output_bits = output_bytes * 8
+    if output_bits % block_size != 0:
+        raise ValueError("output bits must be divisible by block_size")
+
+    rng = random.Random(seed)
+    states = {
+        "mini_sha": {
+            "ones_count": 0,
+            "runs": [],
+            "longest_runs": [],
+            "block_counts": [0] * (1 << block_size),
+        },
+        "random": {
+            "ones_count": 0,
+            "runs": [],
+            "longest_runs": [],
+            "block_counts": [0] * (1 << block_size),
+        },
+    }
+
+    for _ in range(samples):
+        data = rng.randbytes(input_bytes)
+        sample_bits_by_source = {
+            "mini_sha": digest_bits(data, rounds=rounds, output_bytes=output_bytes),
+            "random": [rng.randrange(2) for _ in range(output_bits)],
+        }
+        for source, bits in sample_bits_by_source.items():
+            state = states[source]
+            state["ones_count"] += sum(bits)
+            state["runs"].append(count_runs(bits))
+            state["longest_runs"].append(longest_run(bits))
+            block_counts = state["block_counts"]
+            for index in range(0, output_bits, block_size):
+                block_counts[block_value(bits[index : index + block_size])] += 1
+
+    results: list[LowOrderStatsResult] = []
+    for source, state in states.items():
+        results.append(
+            LowOrderStatsResult(
+                source=source,
+                rounds=rounds,
+                seed=seed,
+                samples=samples,
+                input_bytes=input_bytes,
+                output_bits=output_bits,
+                block_size=block_size,
+                ones_count=state["ones_count"],
+                bit_count=samples * output_bits,
+                runs=tuple(state["runs"]),
+                longest_runs=tuple(state["longest_runs"]),
+                block_counts=tuple(state["block_counts"]),
+            )
+        )
+    return results
 
 
 def sigmoid(x: float) -> float:
@@ -927,6 +1068,113 @@ def run_avalanche_bit_seed_ci(args: argparse.Namespace) -> None:
     write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
 
 
+def run_low_order_stats(args: argparse.Namespace) -> None:
+    summary_rows: list[dict[str, object]] = []
+    block_rows: list[dict[str, object]] = []
+
+    for rounds in args.rounds:
+        for seed in args.seeds:
+            for result in low_order_stats(
+                rounds=rounds,
+                samples=args.samples,
+                seed=seed,
+                input_bytes=args.input_bytes,
+                output_bytes=args.output_bytes,
+                block_size=args.block_size,
+            ):
+                summary_rows.append(
+                    {
+                        "experiment": "low_order_stats",
+                        "source": result.source,
+                        "hash_name": "mini_sha" if result.source == "mini_sha" else "random_bits",
+                        "rounds": result.rounds,
+                        "seed": result.seed,
+                        "samples": result.samples,
+                        "input_bytes": result.input_bytes,
+                        "output_bits": result.output_bits,
+                        "block_size": result.block_size,
+                        "bit_count": result.bit_count,
+                        "ones_count": result.ones_count,
+                        "ones_rate": f"{result.ones_rate:.8f}",
+                        "zero_rate": f"{result.zero_rate:.8f}",
+                        "runs_mean": f"{result.mean_runs:.6f}",
+                        "runs_min": min(result.runs),
+                        "runs_max": max(result.runs),
+                        "longest_run_mean": f"{result.mean_longest_run:.6f}",
+                        "longest_run_min": min(result.longest_runs),
+                        "longest_run_max": max(result.longest_runs),
+                    }
+                )
+                uniform_rate = 1 / len(result.block_counts)
+                for value, count in enumerate(result.block_counts):
+                    rate = count / result.total_blocks
+                    block_rows.append(
+                        {
+                            "experiment": "low_order_stats_block_frequency",
+                            "source": result.source,
+                            "hash_name": "mini_sha" if result.source == "mini_sha" else "random_bits",
+                            "rounds": result.rounds,
+                            "seed": result.seed,
+                            "samples": result.samples,
+                            "input_bytes": result.input_bytes,
+                            "output_bits": result.output_bits,
+                            "block_size": result.block_size,
+                            "block_value": format(value, f"0{result.block_size}b"),
+                            "block_count": count,
+                            "total_blocks": result.total_blocks,
+                            "block_rate": f"{rate:.8f}",
+                            "uniform_rate": f"{uniform_rate:.8f}",
+                            "block_rate_minus_uniform": f"{rate - uniform_rate:.8f}",
+                        }
+                    )
+
+    summary_fieldnames = [
+        "experiment",
+        "source",
+        "hash_name",
+        "rounds",
+        "seed",
+        "samples",
+        "input_bytes",
+        "output_bits",
+        "block_size",
+        "bit_count",
+        "ones_count",
+        "ones_rate",
+        "zero_rate",
+        "runs_mean",
+        "runs_min",
+        "runs_max",
+        "longest_run_mean",
+        "longest_run_min",
+        "longest_run_max",
+    ]
+    block_fieldnames = [
+        "experiment",
+        "source",
+        "hash_name",
+        "rounds",
+        "seed",
+        "samples",
+        "input_bytes",
+        "output_bits",
+        "block_size",
+        "block_value",
+        "block_count",
+        "total_blocks",
+        "block_rate",
+        "uniform_rate",
+        "block_rate_minus_uniform",
+    ]
+
+    print(",".join(summary_fieldnames))
+    for row in summary_rows:
+        print(",".join(str(row[field]) for field in summary_fieldnames))
+
+    write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
+    write_rows_csv(args.block_output, block_fieldnames, block_rows)
+
+
 def run_distinguish(args: argparse.Namespace) -> None:
     print(
         "rounds,samples,epochs,random_guess_baseline,majority_baseline,"
@@ -1043,6 +1291,17 @@ def build_parser() -> argparse.ArgumentParser:
     avalanche_bit_seed_ci_parser.add_argument("--ci-level", type=float, default=0.95)
     avalanche_bit_seed_ci_parser.add_argument("--baseline", type=float, default=0.5)
     avalanche_bit_seed_ci_parser.set_defaults(func=run_avalanche_bit_seed_ci)
+
+    low_order_parser = subparsers.add_parser("low-order-stats")
+    low_order_parser.add_argument("--rounds", nargs="+", type=int, required=True)
+    low_order_parser.add_argument("--samples", type=int, default=500)
+    low_order_parser.add_argument("--seeds", nargs="+", type=int, required=True)
+    low_order_parser.add_argument("--summary-output", type=Path, required=True)
+    low_order_parser.add_argument("--block-output", type=Path, required=True)
+    low_order_parser.add_argument("--input-bytes", type=int, default=32)
+    low_order_parser.add_argument("--output-bytes", type=int, default=32)
+    low_order_parser.add_argument("--block-size", type=int, choices=(2, 4), default=4)
+    low_order_parser.set_defaults(func=run_low_order_stats)
 
     distinguish_parser = subparsers.add_parser("distinguish")
     add_common_rounds(distinguish_parser)
