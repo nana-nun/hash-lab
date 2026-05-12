@@ -1,0 +1,42 @@
+{
+  "experiment": "distinguish-baseline-delta-ci",
+  "issue": 50,
+  "executed_at": "2026-05-12T13:55:23+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe results/2026-05-12-distinguish-baseline-delta-ci/compute_ci.py",
+  "source": "results/2026-05-10-distinguish-size-epochs-sensitivity/seed_metrics.csv",
+  "outputs": {
+    "seed_baseline_deltas": "seed_baseline_deltas.csv",
+    "baseline_delta_ci": "baseline_delta_ci.csv",
+    "notes": "notes.md"
+  },
+  "hash": "mini-sha",
+  "rounds": [
+    4,
+    8,
+    16
+  ],
+  "samples_per_class": [
+    500,
+    1000,
+    2000
+  ],
+  "epochs": [
+    4,
+    8,
+    16
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "metric": "test_accuracy_minus_baseline",
+  "baseline_delta": 0.0,
+  "ci_method": "seed_mean_percentile_bootstrap",
+  "ci_level": 0.95,
+  "bootstrap_iterations": 10000,
+  "bootstrap_seed": 20260512,
+  "model_config": "logistic regression from Issue #18 result files"
+}
