@@ -37,6 +37,7 @@
 - A. F. Webster and Stafford E. Tavares, *On the Design of S-Boxes*, 1986.
   - BibTeX: `webster_design_1986`
   - Note: `references/notes/webster-tavares-sboxes-1986.md`
+  - BIC note: `references/notes/bic-bit-correlation-methods.md`
   - avalanche effect と Strict Avalanche Criterion の源流として読む。hash-lab の bit flip 実験で「平均0.5」を baseline にする理由を整理するための基礎文献。
 - Réjane Forré, *The Strict Avalanche Criterion: Spectral Properties of Boolean Functions and an Extended Definition*, 1988.
   - BibTeX: `forre_strict_1988`
@@ -59,10 +60,12 @@
 - Evaristo José Madarro-Capó et al., *Bit Independence Criterion Extended to Stream Ciphers*, 2020.
   - BibTeX: `madarro_bic_2020`
   - Note: `references/notes/input-bit-avalanche-influence.md`
+  - BIC note: `references/notes/bic-bit-correlation-methods.md`
   - BIC を input-output bit dependency の実験アルゴリズムとして拡張する文献。hash-lab では stream cipher評価そのものではなく、入力bit・出力bitの依存行列を作る発想の参考にする。
 - Darshana Upadhyay, Nupur Gaikwad, Marzia Zaman, and Srinivas Sampalli, *Investigating the Avalanche Effect of Various Cryptographically Secure Hash Functions and Hash-Based Applications*, 2022.
   - BibTeX: `upadhyay_avalanche_2022`
   - Note: `references/notes/upadhyay-avalanche-2022.md`
+  - BIC note: `references/notes/bic-bit-correlation-methods.md`
   - 複数の実ハッシュ関数と hash-based application で avalanche / SAC / BIC / randomness tests を測った実験研究。hash-lab の測定項目を増やすときの比較対象。
 - Lawrence E. Bassham et al., *A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications*, NIST SP 800-22 Rev. 1a, 2010.
   - BibTeX: `nist_sp800_22r1a_2010`
