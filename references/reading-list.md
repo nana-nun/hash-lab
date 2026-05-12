@@ -82,11 +82,24 @@
   - Note: `references/notes/benamira-deeper-look-2021.md`
   - Gohr型 neural distinguisher が何を学んでいるかを解釈する文献。hash-lab では neural distinguisher の精度だけでなく、単純な統計量や baseline との差を見る理由になる。
 - Carlo Brunetta and Pablo Picazo-Sanchez, *Modelling Cryptographic Distinguishers Using Machine Learning*, 2022.
+  - BibTeX: `brunetta_modelling_2022`
+  - Note: `references/notes/avalanche-vs-distinguisher.md`
   - distinguish problem を機械学習 classifier として定式化する一般的な方法論。hash出力 vs random bit列の local distinguisher 実験の枠組み整理に使う。
 - Ongee Jeong and Inkyu Moon, *Deep Learning-Based Hash Function Cryptanalysis*, 2024.
   - MD5 の step 数を変え、fully-connected neural network と BiLSTM で学習する hash function 寄りの最近例。hash-lab の reduced-round/toy hash の学習実験と近いが、短い conference paper なので補助文献として扱う。
 - François-Xavier Standaert, *Introduction to Side-Channel Attacks*, 2010.
   - ML暗号解析とは別系統だが、統計的漏洩・識別の考え方の参考。
+
+## Core: Cryptographic Distinguishers and Pseudorandomness
+
+- Mihir Bellare and Phillip Rogaway, *Introduction to Modern Cryptography*, 2005.
+  - BibTeX: `bellare_rogaway_modern_2005`
+  - Note: `references/notes/avalanche-vs-distinguisher.md`
+  - PRF、hash function、indistinguishability の基本的なゲームベースの考え方を確認するための講義ノート。hash-lab では「classifier accuracy が少し高い」ことと「暗号学的に強い distinguisher がある」ことを分けて読むために使う。
+- Michael Luby, *Pseudorandomness and Cryptographic Applications*, 1996.
+  - BibTeX: `luby_pseudorandomness_1996`
+  - Note: `references/notes/avalanche-vs-distinguisher.md`
+  - pseudorandomness を「効率的な観測者がランダムと区別できない」性質として見る背景。hash-lab の toy hash 実験では、この厳密な安全性定義ではなく、局所的な小規模 distinguisher task を扱っていることを明確にする。
 
 ## Core: Statistical Evaluation
 
