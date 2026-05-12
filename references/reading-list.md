@@ -34,6 +34,22 @@
   - SAC を Boolean function の spectral property として扱う文献。toy hash の出力bit単位の偏りを見るときの理論背景。
 - Sheelagh Lloyd, *Counting Binary Functions with Certain Cryptographic Properties*, 1992.
   - SAC、balance、correlation immunity の関係を整理する文献。avalanche だけで「安全」と言い切れない理由の確認に使う。
+- Bart Preneel, Werner Van Leekwijck, Luc Van Linden, René Govaerts, and Joos Vandewalle, *Propagation Characteristics of Boolean Functions*, 1990.
+  - BibTeX: `preneel_propagation_1990`
+  - Note: `references/notes/input-bit-avalanche-influence.md`
+  - SAC を propagation criterion として一般化し、入力差分方向ごとの導関数・自己相関で見る考え方を与える。Issue #44 の「入力bit位置を固定して output bit 255 の flip rate を見る」設計に近い。
+- Ryan O'Donnell, *Analysis of Boolean Functions*, 2014.
+  - BibTeX: `odonnell_analysis_2014`
+  - Note: `references/notes/input-bit-avalanche-influence.md`
+  - Boolean function の influence / Fourier analysis の標準的な教科書。hash-lab では厳密な全入力空間解析ではなく、sampled influence として入力bit位置別 flip rate を解釈するための語彙に使う。
+- Aniruddha Biswas and Palash Sarkar, *Influence of a Set of Variables on a Boolean Function*, 2023.
+  - BibTeX: `biswas_influence_2023`
+  - Note: `references/notes/input-bit-avalanche-influence.md`
+  - 変数集合の influence を自己相関ベースで扱う近年の整理。単一入力bitだけでなく、複数bit差分や内部語単位へ測定を広げる場合の背景として読む。
+- Evaristo José Madarro-Capó et al., *Bit Independence Criterion Extended to Stream Ciphers*, 2020.
+  - BibTeX: `madarro_bic_2020`
+  - Note: `references/notes/input-bit-avalanche-influence.md`
+  - BIC を input-output bit dependency の実験アルゴリズムとして拡張する文献。hash-lab では stream cipher評価そのものではなく、入力bit・出力bitの依存行列を作る発想の参考にする。
 - Darshana Upadhyay, Nupur Gaikwad, Marzia Zaman, and Srinivas Sampalli, *Investigating the Avalanche Effect of Various Cryptographically Secure Hash Functions and Hash-Based Applications*, 2022.
   - BibTeX: `upadhyay_avalanche_2022`
   - Note: `references/notes/upadhyay-avalanche-2022.md`
