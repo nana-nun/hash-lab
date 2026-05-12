@@ -70,6 +70,14 @@ Pr[V_j^i = 1 and V_k^i = 1] ~= Pr[V_j^i = 1] * Pr[V_k^i = 1]
 
 `input_bit_index` をランダムに選ぶ aggregate avalanche の場合も、BIC では入力bitごとに条件が変わるため、反転した入力bitを保存する。Issue #44 のように入力bitを固定する場合は、`input_bit_index` ごとに pairwise correlation を計算できる。
 
+hash-lab では Issue #77 で `avalanche-vectors` CLI を追加した。例:
+
+```powershell
+python -m src.hash_lab.cli avalanche-vectors --rounds 12 13 14 --samples 500 --seeds 1 2 3 --fixed-input-bit 255 --vector-output results/avalanche-vectors.csv
+```
+
+`--fixed-input-bit` を省略すると sampleごとにランダムな入力bitを反転し、CSVの `input_bit_index` に実際に反転した位置を保存する。
+
 集約出力の推奨列:
 
 - `rounds`
@@ -118,6 +126,6 @@ BIC / pairwise correlation が小さい場合:
 
 ## Next
 
-- #77 で `avalanche-vector` 形式の保存コマンドを追加し、サンプルごとの `avalanche_hex` と `input_bit_index` を必須にする。
+- `avalanche-vectors` の出力を読み、rejected output bits の pairwise correlation を小さく測る。
 - #74 / #75 の input-bit局在比較と組み合わせる場合は、rejected output bits の pairwise correlation を小さく見る。
 - 全bit pairを扱う前に、visualization と multiple testing の方針を `notes.md` に残す。

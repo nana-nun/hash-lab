@@ -7,6 +7,7 @@ from pathlib import Path
 from src.hash_lab.experiments import (
     avalanche,
     avalanche_ratios,
+    avalanche_vectors,
     bit_avalanche,
     bootstrap_mean_ci,
     baseline_normal_p_value,
@@ -22,6 +23,7 @@ from src.hash_lab.experiments import (
     read_bit_metrics_by_seed,
     read_metrics_by_round_and_bit,
     read_per_sample_ratios,
+    run_avalanche_vectors,
     run_low_order_stats,
     save_results,
     wilson_score_ci,
@@ -65,6 +67,29 @@ class MiniShaTests(unittest.TestCase):
 
         self.assertEqual(len(per_bit.flip_counts), 256)
         self.assertAlmostEqual(per_bit.mean_flip_rate, aggregate.mean)
+
+    def test_avalanche_vectors_preserve_fixed_input_bit_and_hex_vector(self):
+        rows = avalanche_vectors(
+            rounds=4,
+            samples=3,
+            seed=5,
+            input_bytes=32,
+            output_bytes=2,
+            fixed_input_bit=7,
+        )
+
+        self.assertEqual(len(rows), 3)
+        self.assertEqual({row.input_bit_index for row in rows}, {7})
+        self.assertEqual({row.input_bit_mode for row in rows}, {"fixed"})
+        self.assertEqual({row.output_bits for row in rows}, {16})
+        self.assertTrue(all(len(row.avalanche_hex) == 4 for row in rows))
+
+    def test_avalanche_vectors_track_random_input_bits(self):
+        rows = avalanche_vectors(rounds=4, samples=5, seed=5, output_bytes=1)
+
+        self.assertEqual([row.sample_index for row in rows], list(range(5)))
+        self.assertEqual({row.input_bit_mode for row in rows}, {"random"})
+        self.assertTrue(all(0 <= row.input_bit_index < 256 for row in rows))
 
     def test_percentile_interpolates(self):
         self.assertEqual(percentile([0.0, 10.0], 0.5), 5.0)
@@ -221,6 +246,37 @@ class MiniShaTests(unittest.TestCase):
         finally:
             summary_output.unlink(missing_ok=True)
             block_output.unlink(missing_ok=True)
+
+    def test_run_avalanche_vectors_writes_sample_csv(self):
+        vector_output = Path("results/test-avalanche-vectors.csv")
+        try:
+            vector_output.unlink(missing_ok=True)
+            args = Namespace(
+                rounds=[4],
+                samples=2,
+                seeds=[1],
+                vector_output=vector_output,
+                input_bytes=32,
+                output_bytes=2,
+                fixed_input_bit=3,
+            )
+
+            run_avalanche_vectors(args)
+
+            with vector_output.open(newline="", encoding="utf-8") as handle:
+                rows = list(csv.DictReader(handle))
+
+            self.assertEqual(len(rows), 2)
+            self.assertEqual(rows[0]["experiment"], "avalanche_vectors")
+            self.assertEqual(rows[0]["rounds"], "4")
+            self.assertEqual(rows[0]["seed"], "1")
+            self.assertEqual(rows[0]["sample_index"], "0")
+            self.assertEqual(rows[0]["input_bit_index"], "3")
+            self.assertEqual(rows[0]["input_bit_mode"], "fixed")
+            self.assertEqual(rows[0]["output_bits"], "16")
+            self.assertEqual(len(rows[0]["avalanche_hex"]), 4)
+        finally:
+            vector_output.unlink(missing_ok=True)
 
     def test_majority_baseline_accuracy(self):
         rows = [([0], 1), ([1], 1), ([0], 0), ([1], 1)]

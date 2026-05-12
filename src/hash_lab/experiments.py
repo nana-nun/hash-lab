@@ -67,6 +67,18 @@ class BitAvalancheResult:
 
 
 @dataclass(frozen=True)
+class AvalancheVectorSample:
+    rounds: int
+    seed: int
+    sample_index: int
+    input_bit_index: int
+    input_bit_mode: str
+    input_bytes: int
+    output_bits: int
+    avalanche_hex: str
+
+
+@dataclass(frozen=True)
 class LowOrderStatsResult:
     source: str
     rounds: int
@@ -190,6 +202,50 @@ def bit_avalanche(
         output_bits=output_bits,
         flip_counts=tuple(flip_counts),
     )
+
+
+def avalanche_vectors(
+    rounds: int,
+    samples: int,
+    seed: int = 1,
+    input_bytes: int = 32,
+    output_bytes: int = 32,
+    fixed_input_bit: int | None = None,
+) -> list[AvalancheVectorSample]:
+    if samples < 1:
+        raise ValueError("samples must be positive")
+    if input_bytes < 1 or input_bytes > 55:
+        raise ValueError("input_bytes must be between 1 and 55")
+    if output_bytes < 1:
+        raise ValueError("output_bytes must be positive")
+
+    input_bits = input_bytes * 8
+    if fixed_input_bit is not None and (fixed_input_bit < 0 or fixed_input_bit >= input_bits):
+        raise ValueError("fixed_input_bit must be within the input bit range")
+
+    rng = random.Random(seed)
+    rows: list[AvalancheVectorSample] = []
+    for sample_index in range(samples):
+        data = rng.randbytes(input_bytes)
+        input_bit_index = fixed_input_bit if fixed_input_bit is not None else rng.randrange(input_bits)
+        changed = flip_one_bit(data, input_bit_index)
+        left = digest(data, rounds=rounds, output_bytes=output_bytes)
+        right = digest(changed, rounds=rounds, output_bytes=output_bytes)
+        avalanche = bytes(a ^ b for a, b in zip(left, right))
+        rows.append(
+            AvalancheVectorSample(
+                rounds=rounds,
+                seed=seed,
+                sample_index=sample_index,
+                input_bit_index=input_bit_index,
+                input_bit_mode="fixed" if fixed_input_bit is not None else "random",
+                input_bytes=input_bytes,
+                output_bits=output_bytes * 8,
+                avalanche_hex=avalanche.hex(),
+            )
+        )
+
+    return rows
 
 
 def percentile(sorted_values: list[float], probability: float) -> float:
@@ -781,6 +837,72 @@ def run_avalanche_bits(args: argparse.Namespace) -> None:
     write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
 
 
+def run_avalanche_vectors(args: argparse.Namespace) -> None:
+    rows: list[dict[str, object]] = []
+    summary_rows: list[dict[str, object]] = []
+
+    for rounds in args.rounds:
+        for seed in args.seeds:
+            samples = avalanche_vectors(
+                rounds=rounds,
+                samples=args.samples,
+                seed=seed,
+                input_bytes=args.input_bytes,
+                output_bytes=args.output_bytes,
+                fixed_input_bit=args.fixed_input_bit,
+            )
+            for sample in samples:
+                rows.append(
+                    {
+                        "experiment": "avalanche_vectors",
+                        "rounds": sample.rounds,
+                        "seed": sample.seed,
+                        "sample_index": sample.sample_index,
+                        "input_bit_index": sample.input_bit_index,
+                        "input_bit_mode": sample.input_bit_mode,
+                        "input_bytes": sample.input_bytes,
+                        "output_bits": sample.output_bits,
+                        "avalanche_hex": sample.avalanche_hex,
+                    }
+                )
+            summary_rows.append(
+                {
+                    "rounds": rounds,
+                    "seed": seed,
+                    "samples": len(samples),
+                    "input_bit_mode": "fixed" if args.fixed_input_bit is not None else "random",
+                    "output_bits": args.output_bytes * 8,
+                    "rows_written": len(samples),
+                }
+            )
+
+    fieldnames = [
+        "experiment",
+        "rounds",
+        "seed",
+        "sample_index",
+        "input_bit_index",
+        "input_bit_mode",
+        "input_bytes",
+        "output_bits",
+        "avalanche_hex",
+    ]
+    summary_fieldnames = [
+        "rounds",
+        "seed",
+        "samples",
+        "input_bit_mode",
+        "output_bits",
+        "rows_written",
+    ]
+
+    print(",".join(summary_fieldnames))
+    for row in summary_rows:
+        print(",".join(str(row[field]) for field in summary_fieldnames))
+
+    write_rows_csv(args.vector_output, fieldnames, rows)
+
+
 def run_avalanche_seed_bootstrap(args: argparse.Namespace) -> None:
     ratios_by_round = read_per_sample_ratios(args.samples_input)
     per_sample_metrics = (
@@ -1258,6 +1380,16 @@ def build_parser() -> argparse.ArgumentParser:
     avalanche_bits_parser.add_argument("--output-bytes", type=int, default=32)
     avalanche_bits_parser.add_argument("--baseline", type=float, default=0.5)
     avalanche_bits_parser.set_defaults(func=run_avalanche_bits)
+
+    avalanche_vectors_parser = subparsers.add_parser("avalanche-vectors")
+    avalanche_vectors_parser.add_argument("--rounds", nargs="+", type=int, required=True)
+    avalanche_vectors_parser.add_argument("--samples", type=int, default=500)
+    avalanche_vectors_parser.add_argument("--seeds", nargs="+", type=int, required=True)
+    avalanche_vectors_parser.add_argument("--vector-output", type=Path, required=True)
+    avalanche_vectors_parser.add_argument("--input-bytes", type=int, default=32)
+    avalanche_vectors_parser.add_argument("--output-bytes", type=int, default=32)
+    avalanche_vectors_parser.add_argument("--fixed-input-bit", type=int)
+    avalanche_vectors_parser.set_defaults(func=run_avalanche_vectors)
 
     avalanche_seed_bootstrap_parser = subparsers.add_parser("avalanche-seed-bootstrap")
     avalanche_seed_bootstrap_parser.add_argument("--rounds", nargs="+", type=int, required=True)
