@@ -88,6 +88,37 @@
 - François-Xavier Standaert, *Introduction to Side-Channel Attacks*, 2010.
   - ML暗号解析とは別系統だが、統計的漏洩・識別の考え方の参考。
 
+## Core: Statistical Evaluation
+
+- Edwin B. Wilson, *Probable Inference, the Law of Succession, and Statistical Inference*, 1927.
+  - BibTeX: `wilson_probable_1927`
+  - Note: `references/notes/distinguisher-accuracy-ci-methods.md`
+  - classifier accuracy や bit flip rate を二項比率として見るときの Wilson score interval の基礎文献。
+- Lawrence D. Brown, T. Tony Cai, and Anirban DasGupta, *Interval Estimation for a Binomial Proportion*, 2001.
+  - BibTeX: `brown_interval_2001`
+  - Note: `references/notes/distinguisher-accuracy-ci-methods.md`
+  - Wald interval の弱さと Wilson などの代替を比較する整理。hash-lab では test split単位の accuracy CI を使うときの基準にする。
+- Bradley Efron, *Bootstrap Methods: Another Look at the Jackknife*, 1979.
+  - BibTeX: `efron_bootstrap_1979`
+  - Note: `references/notes/distinguisher-accuracy-ci-methods.md`
+  - seed平均や実験条件ごとの平均差分に分布仮定を置きにくいとき、bootstrap CI を探索的に使う背景。
+- Sture Holm, *A Simple Sequentially Rejective Multiple Test Procedure*, 1979.
+  - BibTeX: `holm_sequentially_1979`
+  - Note: `references/notes/distinguisher-accuracy-ci-methods.md`
+  - round、samples、epochs、bit位置など複数条件を見るときの family-wise error control の基本文献。
+- Thomas G. Dietterich, *Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms*, 1998.
+  - BibTeX: `dietterich_tests_1998`
+  - Note: `references/notes/distinguisher-accuracy-ci-methods.md`
+  - classifier比較で単純な split反復や比率差検定が過大に有意になりやすいことを警告する文献。hash-lab では seedやtrain/test splitを独立サンプルのように扱いすぎないために読む。
+- Claude Nadeau and Yoshua Bengio, *Inference for the Generalization Error*, 2003.
+  - BibTeX: `nadeau_inference_2003`
+  - Note: `references/notes/distinguisher-accuracy-ci-methods.md`
+  - generalization error の分散推定では training set のランダム性も考える必要がある、という整理。seed階層CIとtest split内CIを分ける理由になる。
+- Ron Kohavi, *A Study of Cross-Validation and Bootstrap for Accuracy Estimation and Model Selection*, 1995.
+  - BibTeX: `kohavi_cross_validation_1995`
+  - Note: `references/notes/distinguisher-accuracy-ci-methods.md`
+  - cross-validation と bootstrap を accuracy estimation / model selection の観点で比較する古典的実験。hash-lab ではモデル選択を強く主張せず、固定設定の不確実性評価として読む。
+
 ## Background: Bitcoin and Mining
 
 - Satoshi Nakamoto, *Bitcoin: A Peer-to-Peer Electronic Cash System*, 2008.
