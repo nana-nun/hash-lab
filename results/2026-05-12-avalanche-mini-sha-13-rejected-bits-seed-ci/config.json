@@ -1,0 +1,27 @@
+{
+  "experiment": "avalanche-mini-sha-13-rejected-bits-seed-ci",
+  "issue": 47,
+  "executed_at": "2026-05-12T13:35:01+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe -m hash_lab.cli avalanche-bit-seed-ci --rounds 13 --output-bits 225 228 231 254 255 --bit-input results/2026-05-10-avalanche-mini-sha-13-bit255-extra-seeds/bit_metrics.csv --pooled-ci-input results/2026-05-10-avalanche-mini-sha-13-bit255-extra-seeds/bit_ci_metrics.csv --seed-output results/2026-05-12-avalanche-mini-sha-13-rejected-bits-seed-ci/seed_bit_metrics.csv --summary-output results/2026-05-12-avalanche-mini-sha-13-rejected-bits-seed-ci/seed_ci_summary.csv --bootstrap-iterations 10000 --bootstrap-seed 20260512",
+  "input": {
+    "bit_metrics": "results/2026-05-10-avalanche-mini-sha-13-bit255-extra-seeds/bit_metrics.csv",
+    "pooled_ci_metrics": "results/2026-05-10-avalanche-mini-sha-13-bit255-extra-seeds/bit_ci_metrics.csv"
+  },
+  "output": {
+    "seed_bit_metrics": "seed_bit_metrics.csv",
+    "seed_ci_summary": "seed_ci_summary.csv",
+    "notes": "notes.md"
+  },
+  "hash": "mini-sha",
+  "rounds": [13],
+  "output_bits": [225, 228, 231, 254, 255],
+  "seeds": "1..20",
+  "samples_per_seed": 2000,
+  "total_samples_per_bit": 40000,
+  "baseline": 0.5,
+  "ci_method": "seed_mean_percentile_bootstrap",
+  "ci_level": 0.95,
+  "bootstrap_iterations": 10000,
+  "bootstrap_seed": 20260512,
+  "model_config": null
+}
