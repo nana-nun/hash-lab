@@ -15,6 +15,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m src.hash_lab.cli avalanche --rounds 4 8 16 32 --samples 200
 python -m src.hash_lab.cli distinguish --rounds 2 4 8 16 --samples 1000 --epochs 8
+python -m src.hash_lab.cli low-order-stats --rounds 4 8 --samples 200 --seeds 1 --summary-output results/low-order-summary.csv --block-output results/low-order-blocks.csv
 python -m unittest discover -s tests
 ```
 
@@ -23,9 +24,12 @@ python -m unittest discover -s tests
 ```powershell
 python -m src.hash_lab.cli avalanche --rounds 2 4 8 16 32 --samples 500 --seed 1 --output results/avalanche.csv --format csv
 python -m src.hash_lab.cli distinguish --rounds 2 4 8 16 --samples 1000 --epochs 8 --seed 1 --output results/distinguish.json --format json
+python -m src.hash_lab.cli low-order-stats --rounds 2 4 8 16 --samples 500 --seeds 1 2 3 --block-size 4 --summary-output results/low-order-summary.csv --block-output results/low-order-blocks.csv
 ```
 
 `--output` を指定しない場合は、従来どおり標準出力だけに結果を表示します。保存するCSVには `experiment`、`seed`、`rounds`、`samples` などの実行条件を含めます。JSONは `metadata` と `results` に分けて保存します。
+
+`low-order-stats` は ML classifier を使わず、`mini_sha` のdigest列と同じ長さのrandom bit列について、ones rate、runs count、longest run、2-bit/4-bit block frequencyを集計します。`summary-output` には round・seed・samples・hash設定と低次統計の要約、`block-output` には block値ごとの頻度と一様分布との差分を保存します。
 
 実験ノートを書くときは `docs/experiment-log-template.md` を使います。書き方の例として、`docs/experiment-log-example-avalanche-mini-sha.md` に mini-sha avalanche の小規模実験ノートがあります。
 
