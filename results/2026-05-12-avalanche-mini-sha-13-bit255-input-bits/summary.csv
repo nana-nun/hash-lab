@@ -1,0 +1,2 @@
+rounds,output_bit_index,input_bits,seed_count,samples_per_seed_per_input_bit,total_samples_per_input_bit,baseline,min_flip_rate,min_input_bit_index,max_flip_rate,max_input_bit_index,mean_flip_rate,max_abs_delta_from_0_5,ci_excludes_baseline_count,holm_reject_count,holm_rejected_input_bits
+13,255,256,20,500,10000,0.500000,0.064900,224,0.842300,237,0.488720,0.435100,49,32,194 199 203 204 214 216 218 221 222 224 226 227 228 229 231 232 233 235 236 237 240 241 242 243 245 246 247 248 250 251 253 254
