@@ -1,0 +1,4 @@
+rounds,input_bits,output_bits,input_bit_count,output_bit_count,output_bit_pairs,seed_count,samples_per_seed,samples_per_input_bit,pair_rows,defined_pair_rows,max_abs_correlation,max_abs_correlation_input_bit_index,max_abs_correlation_output_bit_j,max_abs_correlation_output_bit_k,max_abs_correlation_value
+12,224 236 248 250 254,225 228 231 254 255,5,5,10,5,1000,5000,50,43,0.72943074,236,254,255,0.72943074
+13,224 236 248 250 254,225 228 231 254 255,5,5,10,5,1000,5000,50,50,0.56636973,236,254,255,-0.56636973
+14,224 236 248 250 254,225 228 231 254 255,5,5,10,5,1000,5000,50,50,0.06761781,250,225,255,-0.06761781

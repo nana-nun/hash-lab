@@ -1,0 +1,88 @@
+{
+  "experiment": "avalanche-mini-sha-bic-rejected-bits",
+  "issue": 83,
+  "executed_at": "2026-05-14T08:59:48+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe results/2026-05-14-avalanche-mini-sha-bic-rejected-bits/compute_bic_pair_correlation.py",
+  "hash": "mini-sha",
+  "rounds": [
+    12,
+    13,
+    14
+  ],
+  "input_bit_mode": "fixed",
+  "input_bits": [
+    224,
+    236,
+    248,
+    250,
+    254
+  ],
+  "output_bits": [
+    225,
+    228,
+    231,
+    254,
+    255
+  ],
+  "output_bit_pairs": [
+    [
+      225,
+      228
+    ],
+    [
+      225,
+      231
+    ],
+    [
+      225,
+      254
+    ],
+    [
+      225,
+      255
+    ],
+    [
+      228,
+      231
+    ],
+    [
+      228,
+      254
+    ],
+    [
+      228,
+      255
+    ],
+    [
+      231,
+      254
+    ],
+    [
+      231,
+      255
+    ],
+    [
+      254,
+      255
+    ]
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "samples_per_seed": 1000,
+  "samples_per_input_bit": 5000,
+  "input_bytes": 32,
+  "output_bytes": 32,
+  "baseline": "independent output bit flips have covariance and Pearson correlation near 0",
+  "outputs": {
+    "avalanche_vectors": "avalanche_vectors.csv",
+    "pair_correlation": "pair_correlation.csv",
+    "summary": "summary.csv",
+    "notes": "notes.md"
+  },
+  "model_config": null
+}
