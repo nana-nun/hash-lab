@@ -1,0 +1,5 @@
+rounds,input_bit_mode,output_bits,output_bit_pairs,seed_count,samples_per_seed,samples,defined_pair_rows,holm_reject_count,alpha,max_abs_correlation,max_abs_correlation_output_bit_j,max_abs_correlation_output_bit_k,max_abs_correlation_value,heatmap_png
+12,random,256,32640,5,1000,5000,32640,22,0.050000,0.09787985,233,234,0.09787985,round_12_pair_correlation_heatmap.png
+13,random,256,32640,5,1000,5000,32640,0,0.050000,0.05636122,114,192,-0.05636122,round_13_pair_correlation_heatmap.png
+14,random,256,32640,5,1000,5000,32640,0,0.050000,0.05817582,130,232,-0.05817582,round_14_pair_correlation_heatmap.png
+16,random,256,32640,5,1000,5000,32640,0,0.050000,0.06246363,82,180,-0.06246363,round_16_pair_correlation_heatmap.png
