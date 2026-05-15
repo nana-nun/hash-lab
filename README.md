@@ -2,11 +2,29 @@
 
 縮小ラウンドハッシュがどこまで「学習不能」になるかを調べるための研究MVPです。
 
-このリポジトリは SHA256 の完全攻略を目的にしません。代わりに、SHA256 風の小さなハッシュ関数を作り、ラウンド数を変えながら次の性質を測定します。
+このリポジトリは SHA-256 の完全攻略や実用システムへの攻撃を目的にしません。代わりに、SHA-256 風の小さなハッシュ関数を作り、ラウンド数を変えながら次の性質を測定します。
 
 - Avalanche Effect: 入力を 1 bit 変えたとき出力がどれくらい変わるか
 - Reduced Round: ラウンド数が少ないときに偏りや相関が残るか
 - Neural/ML Cryptanalysis: 簡単な識別器がハッシュ出力とランダム列を見分けられるか
+
+## Research Scope and Non-Claims
+
+hash-lab が扱うのは、toy hash と reduced-round SHA-like hash のローカルな統計的性質です。実運用中の SHA-256、暗号資産ネットワーク、ウォレット、秘密鍵、署名、マイニングプールを攻撃するための研究ではありません。
+
+| 対象 | このリポジトリでの扱い |
+| --- | --- |
+| toy hash | 教育・実験用に作った小さな hash。仕組みを観察しやすくするため、round 数や出力を切り替えて測定します。 |
+| reduced-round SHA-like hash | SHA-256 風の構造を小さくした比較対象。round 数を減らしたとき、どの指標で偏りが見えるかを調べます。 |
+| full SHA-256 | 攻撃対象にしません。実用 SHA-256 の安全性を破った、または弱めたとは主張しません。 |
+
+| 主張できること | 主張できないこと |
+| --- | --- |
+| `mini-sha` の特定 round / seed / sample size で、avalanche、BIC風相関、distinguisher baselineとの差分がどう見えたか。 | 実用 SHA-256 を破れること。 |
+| reduced-round / toy な設定では、round 数が増えると一部指標が random-like に近づくかを観察できること。 | `mean flip ratio = 0.5` に近いことだけで暗号学的安全性全体を示せること。 |
+| ML classifier の精度を、random guess や単純統計 baseline と比較できること。 | AIモデルが実システムのハッシュ、鍵、署名、マイニングを攻撃できること。 |
+
+実験結果は探索的な測定として扱います。avalanche や randomness test を通ることは、暗号学的な安全性証明ではありません。現在の結果の解釈と先行研究との接続は `docs/research-state.md` を参照してください。
 
 ## Quick Start
 
@@ -56,7 +74,7 @@ notebooks/  将来の分析ノート置き場
 
 ## Current MVP
 
-`src/hash_lab/mini_sha.py` は教育・研究用の SHA256 風 toy hash です。32 bit word、ARX 演算、ラウンド数切替、固定長出力を備えています。
+`src/hash_lab/mini_sha.py` は教育・研究用の SHA-256 風 toy hash です。32 bit word、ARX 演算、ラウンド数切替、固定長出力を備えています。
 
 実験の主眼は「ラウンド数が増えるにつれて、出力がランダムと区別しにくくなるか」を観察することです。
 
