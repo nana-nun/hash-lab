@@ -49,6 +49,10 @@
   - BibTeX: `preneel_propagation_1990`
   - Note: `references/notes/input-bit-avalanche-influence.md`
   - SAC を propagation criterion として一般化し、入力差分方向ごとの導関数・自己相関で見る考え方を与える。Issue #44 の「入力bit位置を固定して output bit 255 の flip rate を見る」設計に近い。
+- Xian-Mo Zhang and Yuliang Zheng, *GAC - the Criterion for Global Avalanche Characteristics of Cryptographic Functions*, 1995.
+  - BibTeX: `zhang_gac_1995`
+  - Note: `references/notes/avalanche-criteria-limitations.md`
+  - SAC や propagation criterion の限界を指摘し、暗号関数の avalanche characteristics をより大域的に見る GAC を提案する文献。hash-lab では avalanche 指標を過大解釈しないための背景として読む。
 - Ryan O'Donnell, *Analysis of Boolean Functions*, 2014.
   - BibTeX: `odonnell_analysis_2014`
   - Note: `references/notes/input-bit-avalanche-influence.md`
