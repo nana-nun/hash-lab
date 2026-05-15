@@ -1,0 +1,18 @@
+{
+  "experiment": "random-like-boundary-comparison",
+  "issue": 95,
+  "executed_at": "2026-05-16T08:57:31+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe results/2026-05-16-random-like-boundary-comparison/compare_random_like_boundaries.py",
+  "inputs": {
+    "round_comparison": "results\\2026-05-10-avalanche-distinguisher-round-comparison\\round_comparison.csv",
+    "input_output_heatmap": "results\\2026-05-16-avalanche-mini-sha-input-output-heatmap\\summary.csv",
+    "bic_all_pairs": "results\\2026-05-16-avalanche-mini-sha-bic-all-output-pairs\\summary.csv",
+    "bic_fixed_small": "results\\2026-05-14-avalanche-mini-sha-bic-rejected-bits\\summary.csv"
+  },
+  "outputs": {
+    "round_metric_comparison": "round_metric_comparison.csv",
+    "boundary_summary": "boundary_summary.csv",
+    "notes": "notes.md"
+  },
+  "model_config": null
+}

@@ -1,0 +1,13 @@
+rounds,aggregate_avalanche_mean,aggregate_abs_delta_from_0_5,aggregate_random_like_threshold_0_001,output_bit_sac_holm_reject_count,output_bit_sac_random_like_no_holm_rejects,input_output_heatmap_mean_abs_delta_all,input_output_heatmap_mean_abs_delta_input_224_254,input_output_heatmap_max_abs_delta,bic_all_pairs_holm_reject_count,bic_all_pairs_random_like_no_holm_rejects,bic_all_pairs_max_abs_correlation,bic_fixed_small_max_abs_correlation,distinguisher_available,distinguisher_test_accuracy_minus_baseline,distinguisher_near_baseline_abs_delta_le_0_02
+2,0.0142,0.485800,no,256,no,,,,,not_measured,,,True,0.497500,no
+4,0.0834,0.416600,no,256,no,,,,,not_measured,,,True,0.004500,yes
+8,0.3259,0.174100,no,256,no,,,,,not_measured,,,True,0.005500,yes
+9,0.386652,0.113348,no,234,no,,,,,not_measured,,,False,,not_measured
+10,0.437913,0.062087,no,167,no,,,,,not_measured,,,False,,not_measured
+11,0.473403,0.026597,no,97,no,,,,,not_measured,,,False,,not_measured
+12,0.493620,0.006380,no,35,no,0.033357,0.098593,0.500000,22,no,0.09787985,0.72943074,False,,not_measured
+13,0.499301,0.000699,yes,1,no,0.023679,0.033291,0.437500,0,yes,0.05636122,0.56636973,False,,not_measured
+14,0.499936,0.000064,yes,0,yes,0.022190,0.022493,0.125000,0,yes,0.05817582,0.06761781,False,,not_measured
+15,0.499847,0.000153,yes,0,yes,,,,,not_measured,,,False,,not_measured
+16,0.5001,0.000100,yes,0,yes,0.022252,0.021961,0.125000,0,yes,0.06246363,,True,-0.012500,yes
+32,0.4999,0.000100,yes,0,yes,,,,,not_measured,,,False,,not_measured
