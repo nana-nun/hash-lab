@@ -1,0 +1,5 @@
+rounds,input_bits,output_bits,matrix_cells,seed_count,samples_per_seed_per_input_bit,total_samples_per_cell,baseline,mean_flip_rate,min_flip_rate,max_flip_rate,max_abs_delta_from_0_5,max_abs_delta_input_bit_index,max_abs_delta_output_bit_index,heatmap_png
+12,256,256,65536,5,64,320,0.500000,0.493231,0.000000,1.000000,0.500000,224,109,round_12_baseline_delta_heatmap.png
+13,256,256,65536,5,64,320,0.500000,0.499396,0.062500,0.853125,0.437500,224,255,round_13_baseline_delta_heatmap.png
+14,256,256,65536,5,64,320,0.500000,0.500082,0.378125,0.625000,0.125000,29,164,round_14_baseline_delta_heatmap.png
+16,256,256,65536,5,64,320,0.500000,0.500068,0.375000,0.621875,0.125000,5,107,round_16_baseline_delta_heatmap.png

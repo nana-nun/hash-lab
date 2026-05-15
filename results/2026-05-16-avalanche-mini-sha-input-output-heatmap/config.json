@@ -1,0 +1,42 @@
+{
+  "experiment": "avalanche-mini-sha-input-output-heatmap",
+  "issue": 85,
+  "executed_at": "2026-05-16T00:18:07+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe results/2026-05-16-avalanche-mini-sha-input-output-heatmap/compute_input_output_heatmap.py",
+  "hash": "mini-sha",
+  "rounds": [
+    12,
+    13,
+    14,
+    16
+  ],
+  "input_bytes": 32,
+  "output_bytes": 32,
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "samples_per_seed_per_input_bit": 64,
+  "total_samples_per_cell": 320,
+  "baseline": 0.5,
+  "base_rng_seed": 20260516,
+  "heatmap": {
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "x_axis": "output_bit_index",
+    "y_axis": "input_bit_index",
+    "color_scale": "blue negative delta, white zero, red positive delta; scaled per round by max absolute delta"
+  },
+  "outputs": {
+    "flip_rate_matrix": "flip_rate_matrix.csv",
+    "baseline_delta_matrix": "baseline_delta_matrix.csv",
+    "summary": "summary.csv",
+    "heatmap_png_pattern": "round_<rounds>_baseline_delta_heatmap.png",
+    "notes": "notes.md"
+  },
+  "model_config": null
+}
