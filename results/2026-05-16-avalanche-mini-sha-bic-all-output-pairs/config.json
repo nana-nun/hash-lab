@@ -1,0 +1,47 @@
+{
+  "experiment": "avalanche-mini-sha-bic-all-output-pairs",
+  "issue": 86,
+  "executed_at": "2026-05-16T00:34:06+09:00",
+  "command": ".\\.venv\\Scripts\\python.exe results/2026-05-16-avalanche-mini-sha-bic-all-output-pairs/compute_bic_all_output_pairs.py",
+  "hash": "mini-sha",
+  "rounds": [
+    12,
+    13,
+    14,
+    16
+  ],
+  "input_bit_mode": "random",
+  "input_bytes": 32,
+  "output_bytes": 32,
+  "output_bit_pairs_per_round": 32640,
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "samples_per_seed": 1000,
+  "samples_per_round": 5000,
+  "baseline": "independent output bit flips have covariance and Pearson correlation near 0",
+  "p_value_method": "Pearson chi-square df=1 approximation from phi correlation",
+  "multiple_comparison": "Holm over all output bit pairs per round",
+  "alpha": 0.05,
+  "base_rng_seed": 20260516,
+  "heatmap": {
+    "format": "png",
+    "width": 256,
+    "height": 256,
+    "x_axis": "output_bit_k",
+    "y_axis": "output_bit_j",
+    "color_scale": "blue negative correlation, white zero, red positive correlation; scaled per round by max absolute correlation"
+  },
+  "outputs": {
+    "pair_correlation": "pair_correlation.csv",
+    "top_pairs": "top_pairs.csv",
+    "summary": "summary.csv",
+    "heatmap_png_pattern": "round_<rounds>_pair_correlation_heatmap.png",
+    "notes": "notes.md"
+  },
+  "model_config": null
+}
