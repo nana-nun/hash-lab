@@ -1,0 +1,9 @@
+rounds,seed_count,samples,epochs,random_guess_baseline,mean_majority_baseline,mean_train_accuracy,mean_test_accuracy,mean_test_accuracy_minus_baseline,stdev_test_accuracy_minus_baseline,min_test_accuracy_minus_baseline,max_test_accuracy_minus_baseline,mean_train_test_gap,ci_level,ci_method,bootstrap_iterations,bootstrap_seed,baseline_delta_ci_low,baseline_delta_ci_high,ci_contains_zero
+9,5,2000,8,0.5000,0.5115,0.5430,0.4995,-0.0005,0.0161,-0.0200,0.0225,0.0435,0.9500,seed_mean_percentile_bootstrap,2000,20260525,-0.0117,0.0135,True
+10,5,2000,8,0.5000,0.5115,0.5455,0.5033,0.0033,0.0246,-0.0212,0.0325,0.0422,0.9500,seed_mean_percentile_bootstrap,2000,20260526,-0.0162,0.0228,True
+11,5,2000,8,0.5000,0.5115,0.5369,0.4910,-0.0090,0.0195,-0.0413,0.0112,0.0459,0.9500,seed_mean_percentile_bootstrap,2000,20260527,-0.0268,0.0040,True
+12,5,2000,8,0.5000,0.5115,0.5369,0.4998,-0.0002,0.0078,-0.0087,0.0100,0.0371,0.9500,seed_mean_percentile_bootstrap,2000,20260528,-0.0062,0.0055,True
+13,5,2000,8,0.5000,0.5115,0.5403,0.5018,0.0018,0.0148,-0.0175,0.0175,0.0385,0.9500,seed_mean_percentile_bootstrap,2000,20260529,-0.0105,0.0128,True
+14,5,2000,8,0.5000,0.5115,0.5489,0.5008,0.0008,0.0306,-0.0425,0.0375,0.0482,0.9500,seed_mean_percentile_bootstrap,2000,20260530,-0.0237,0.0235,True
+15,5,2000,8,0.5000,0.5115,0.5436,0.4903,-0.0097,0.0196,-0.0350,0.0112,0.0534,0.9500,seed_mean_percentile_bootstrap,2000,20260531,-0.0252,0.0053,True
+32,5,2000,8,0.5000,0.5115,0.5468,0.5103,0.0103,0.0137,-0.0062,0.0288,0.0365,0.9500,seed_mean_percentile_bootstrap,2000,20260548,0.0003,0.0203,False

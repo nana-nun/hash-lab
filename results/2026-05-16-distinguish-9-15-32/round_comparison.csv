@@ -1,0 +1,9 @@
+rounds,avalanche_mean,avalanche_baseline_delta,sac_max_abs_delta_from_baseline,sac_holm_reject_count,distinguisher_mean_test_accuracy,distinguisher_test_accuracy_minus_baseline,distinguisher_delta_ci_low,distinguisher_delta_ci_high,distinguisher_delta_ci_contains_zero
+9,0.386652,-0.113348,0.233600,234,0.4995,-0.0005,-0.0117,0.0135,True
+10,0.437913,-0.062087,0.171600,167,0.5033,0.0033,-0.0162,0.0228,True
+11,0.473403,-0.026597,0.103200,97,0.4910,-0.0090,-0.0268,0.0040,True
+12,0.493620,-0.006380,0.046000,35,0.4998,-0.0002,-0.0062,0.0055,True
+13,0.499301,-0.000699,0.021600,1,0.5018,0.0018,-0.0105,0.0128,True
+14,0.499936,-0.000064,0.015000,0,0.5008,0.0008,-0.0237,0.0235,True
+15,0.499847,-0.000153,0.014600,0,0.4903,-0.0097,-0.0252,0.0053,True
+32,0.4999,-0.000100,0.016600,0,0.5103,0.0103,0.0003,0.0203,False

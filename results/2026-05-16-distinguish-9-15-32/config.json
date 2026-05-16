@@ -1,0 +1,49 @@
+{
+  "experiment": "distinguish-9-15-32",
+  "issue": 53,
+  "command": ".\\.venv\\Scripts\\python.exe results\\2026-05-16-distinguish-9-15-32\\run_experiment.py",
+  "executed_at": "2026-05-16T20:52:43+09:00",
+  "rounds": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    32
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "samples_per_seed_per_round": 2000,
+  "epochs": 8,
+  "model_config": {
+    "model": "logistic_regression",
+    "learning_rate": 0.08,
+    "features": "256 centered digest bits",
+    "train_split": 0.8
+  },
+  "baseline": {
+    "random_guess_accuracy": 0.5,
+    "majority_baseline": "computed from each shuffled test split"
+  },
+  "ci": {
+    "metric": "test_accuracy_minus_baseline",
+    "method": "seed_mean_percentile_bootstrap",
+    "iterations": 2000,
+    "ci_level": 0.95,
+    "bootstrap_seed": 20260516
+  },
+  "outputs": {
+    "seed_metrics": "seed_metrics.csv",
+    "aggregate_metrics": "aggregate_metrics.csv",
+    "round_comparison": "round_comparison.csv",
+    "run_script": "run_experiment.py",
+    "comparison_script": "compare_with_avalanche.py"
+  }
+}
