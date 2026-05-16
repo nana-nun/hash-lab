@@ -34,6 +34,7 @@
 | `2026-05-09-distinguish-baseline-multi-seed/` | distinguisher | `seed_metrics.csv`, `aggregate_metrics.csv`, `config.json`, `notes.md` | seeds `1..5` の distinguisher baseline。2 rounds は強く識別可能、4/8/16 rounds は平均で baseline 付近。 |
 | `2026-05-10-distinguish-size-epochs-sensitivity/` | distinguisher | `seed_metrics.csv`, `aggregate_metrics.csv`, `config.json`, `notes.md` | samples `500,1000,2000` と epochs `4,8,16` の感度測定。2 rounds は強く識別可能、4/8/16 rounds は平均で baseline 付近。 |
 | `2026-05-12-distinguish-baseline-delta-ci/` | distinguisher uncertainty | `baseline_delta_ci.csv`, `seed_baseline_deltas.csv`, `compute_ci.py`, `config.json`, `notes.md` | Issue #18 の 4/8/16 rounds について `test_accuracy_minus_baseline` の seed階層CIを計算。27条件中26条件でCIが `0` を含み、残り1条件は負方向。 |
+| `2026-05-16-distinguish-9-15-32/` | distinguisher | `seed_metrics.csv`, `aggregate_metrics.csv`, `round_comparison.csv`, `run_experiment.py`, `compare_with_avalanche.py`, `config.json`, `metadata.json`, `notes.md` | 9..15/32 rounds の logistic regression を測定。9..15 rounds は seed階層bootstrap CI が `0` を含む。32 rounds は小さな正方向deltaが出たが、追加確認が必要。 |
 | `2026-05-10-avalanche-distinguisher-round-comparison/` | comparison | `round_comparison.csv`, `config.json`, `notes.md` | avalanche、bit位置偏り、distinguisher baseline差分をround別に横比較。4/8 rounds は avalanche 側に偏りが残るが logistic regression test delta は baseline 付近。 |
 
 ## Reading Order
