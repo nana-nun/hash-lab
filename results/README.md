@@ -2,6 +2,8 @@
 
 このディレクトリは、保存済み実験結果の索引です。AIエージェントは新しい分析を始める前に、このファイルと該当する `notes.md`、metrics CSV/JSON、`docs/research-state.md` を確認してください。
 
+新しいCLI保存結果では、結果ディレクトリに `metadata.json` を保存する。schema と過去結果との互換性方針は `docs/result-metadata-schema.md` を参照してください。既存の `config.json` だけを持つ過去結果も有効な結果として扱います。
+
 ## Experiments
 
 | Directory | Type | Key Files | Summary |

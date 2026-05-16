@@ -1,5 +1,6 @@
 import csv
 import json
+import shutil
 import unittest
 from argparse import Namespace
 from pathlib import Path
@@ -213,11 +214,11 @@ class MiniShaTests(unittest.TestCase):
             self.assertEqual(len(result.longest_runs), 3)
 
     def test_run_low_order_stats_writes_summary_and_block_csvs(self):
-        summary_output = Path("results/test-low-order-summary.csv")
-        block_output = Path("results/test-low-order-blocks.csv")
+        out_dir = Path("results/test-low-order-stats")
+        summary_output = out_dir / "summary.csv"
+        block_output = out_dir / "blocks.csv"
         try:
-            summary_output.unlink(missing_ok=True)
-            block_output.unlink(missing_ok=True)
+            shutil.rmtree(out_dir, ignore_errors=True)
             args = Namespace(
                 rounds=[4],
                 samples=2,
@@ -243,14 +244,19 @@ class MiniShaTests(unittest.TestCase):
             self.assertEqual(summary_rows[0]["samples"], "2")
             self.assertEqual(len(block_rows), 32)
             self.assertIn("block_rate_minus_uniform", block_rows[0])
+
+            metadata = json.loads((out_dir / "metadata.json").read_text(encoding="utf-8"))
+            self.assertEqual(metadata["metadata"]["experiment"], "low_order_stats")
+            self.assertEqual(metadata["outputs"]["summary"], "summary.csv")
+            self.assertIn("python", metadata)
         finally:
-            summary_output.unlink(missing_ok=True)
-            block_output.unlink(missing_ok=True)
+            shutil.rmtree(out_dir, ignore_errors=True)
 
     def test_run_avalanche_vectors_writes_sample_csv(self):
-        vector_output = Path("results/test-avalanche-vectors.csv")
+        out_dir = Path("results/test-avalanche-vectors")
+        vector_output = out_dir / "vectors.csv"
         try:
-            vector_output.unlink(missing_ok=True)
+            shutil.rmtree(out_dir, ignore_errors=True)
             args = Namespace(
                 rounds=[4],
                 samples=2,
@@ -275,8 +281,12 @@ class MiniShaTests(unittest.TestCase):
             self.assertEqual(rows[0]["input_bit_mode"], "fixed")
             self.assertEqual(rows[0]["output_bits"], "16")
             self.assertEqual(len(rows[0]["avalanche_hex"]), 4)
+
+            metadata = json.loads((out_dir / "metadata.json").read_text(encoding="utf-8"))
+            self.assertEqual(metadata["metadata"]["experiment"], "avalanche_vectors")
+            self.assertEqual(metadata["args"]["fixed_input_bit"], 3)
         finally:
-            vector_output.unlink(missing_ok=True)
+            shutil.rmtree(out_dir, ignore_errors=True)
 
     def test_majority_baseline_accuracy(self):
         rows = [([0], 1), ([1], 1), ([0], 0), ([1], 1)]
@@ -293,9 +303,10 @@ class MiniShaTests(unittest.TestCase):
         )
 
     def test_save_results_csv(self):
-        output = Path("results/test-save-results.csv")
+        out_dir = Path("results/test-save-results-csv")
+        output = out_dir / "metrics.csv"
         try:
-            output.unlink(missing_ok=True)
+            shutil.rmtree(out_dir, ignore_errors=True)
             args = Namespace(output=output, format="csv")
             save_results(
                 args,
@@ -318,13 +329,20 @@ class MiniShaTests(unittest.TestCase):
             self.assertEqual(rows[0]["experiment"], "avalanche")
             self.assertEqual(rows[0]["seed"], "1")
             self.assertEqual(rows[0]["rounds"], "4")
+
+            metadata = json.loads((out_dir / "metadata.json").read_text(encoding="utf-8"))
+            self.assertEqual(metadata["schema_version"], 1)
+            self.assertEqual(metadata["metadata"]["experiment"], "avalanche")
+            self.assertEqual(metadata["outputs"]["results"], "metrics.csv")
+            self.assertIn("package_versions", metadata)
         finally:
-            output.unlink(missing_ok=True)
+            shutil.rmtree(out_dir, ignore_errors=True)
 
     def test_save_results_json(self):
-        output = Path("results/test-save-results.json")
+        out_dir = Path("results/test-save-results-json")
+        output = out_dir / "metrics.json"
         try:
-            output.unlink(missing_ok=True)
+            shutil.rmtree(out_dir, ignore_errors=True)
             args = Namespace(output=output, format="json")
             save_results(
                 args,
@@ -338,8 +356,12 @@ class MiniShaTests(unittest.TestCase):
             self.assertEqual(payload["metadata"]["experiment"], "distinguish")
             self.assertEqual(payload["metadata"]["seed"], 3)
             self.assertEqual(payload["results"][0]["rounds"], 8)
+
+            metadata = json.loads((out_dir / "metadata.json").read_text(encoding="utf-8"))
+            self.assertEqual(metadata["metadata"]["experiment"], "distinguish")
+            self.assertEqual(metadata["args"]["format"], "json")
         finally:
-            output.unlink(missing_ok=True)
+            shutil.rmtree(out_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":
