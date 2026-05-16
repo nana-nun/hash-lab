@@ -47,7 +47,7 @@ python -m src.hash_lab.cli low-order-stats --rounds 2 4 8 16 --samples 500 --see
 python -m src.hash_lab.cli avalanche-vectors --rounds 12 13 14 --samples 500 --seeds 1 2 3 --fixed-input-bit 255 --vector-output results/avalanche-vectors.csv
 ```
 
-`--output` を指定しない場合は、従来どおり標準出力だけに結果を表示します。保存するCSVには `experiment`、`seed`、`rounds`、`samples` などの実行条件を含めます。JSONは `metadata` と `results` に分けて保存します。
+`--output` を指定しない場合は、従来どおり標準出力だけに結果を表示します。保存するCSVには `experiment`、`seed`、`rounds`、`samples` などの実行条件を含めます。JSONは `metadata` と `results` に分けて保存します。新しいCLI保存結果では、保存先ディレクトリに `metadata.json` も作成します。schema は `docs/result-metadata-schema.md` を参照してください。
 
 `low-order-stats` は ML classifier を使わず、`mini_sha` のdigest列と同じ長さのrandom bit列について、ones rate、runs count、longest run、2-bit/4-bit block frequencyを集計します。`summary-output` には round・seed・samples・hash設定と低次統計の要約、`block-output` には block値ごとの頻度と一様分布との差分を保存します。
 

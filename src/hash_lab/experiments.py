@@ -4,9 +4,13 @@ from __future__ import annotations
 
 import argparse
 import csv
+import importlib.metadata
 import json
 import math
+import platform
 import random
+import subprocess
+import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -616,6 +620,70 @@ def write_results_json(path: Path, metadata: dict[str, object], rows: list[dict[
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
+def serializable_arg(value: object) -> object:
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, list):
+        return [serializable_arg(item) for item in value]
+    if isinstance(value, tuple):
+        return [serializable_arg(item) for item in value]
+    return value
+
+
+def git_commit_hash() -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return result.stdout.strip()
+
+
+def installed_package_versions() -> dict[str, str]:
+    packages: dict[str, str] = {}
+    for distribution in importlib.metadata.distributions():
+        name = distribution.metadata.get("Name")
+        if name:
+            packages[name] = distribution.version
+    return dict(sorted(packages.items(), key=lambda item: item[0].lower()))
+
+
+def metadata_path_for_outputs(output_paths: list[Path]) -> Path:
+    if not output_paths:
+        raise ValueError("output_paths must not be empty")
+    parents = {path.parent for path in output_paths}
+    parent = output_paths[0].parent if len(parents) > 1 else next(iter(parents))
+    return parent / "metadata.json"
+
+
+def write_metadata_json(
+    output_paths: list[Path],
+    metadata: dict[str, object],
+    args: argparse.Namespace,
+    outputs: dict[str, str],
+) -> None:
+    path = metadata_path_for_outputs(output_paths)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "schema_version": 1,
+        "metadata": metadata,
+        "command": sys.argv,
+        "args": {key: serializable_arg(value) for key, value in vars(args).items() if key != "func"},
+        "git_commit": git_commit_hash(),
+        "python": {
+            "version": platform.python_version(),
+            "implementation": platform.python_implementation(),
+        },
+        "package_versions": installed_package_versions(),
+        "outputs": outputs,
+    }
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
 def save_results(
     args: argparse.Namespace,
     metadata: dict[str, object],
@@ -627,9 +695,10 @@ def save_results(
 
     if args.format == "csv":
         write_rows_csv(args.output, fieldnames, rows)
-        return
+    else:
+        write_results_json(args.output, metadata, rows)
 
-    write_results_json(args.output, metadata, rows)
+    write_metadata_json([args.output], metadata, args, {"results": args.output.name})
 
 
 def run_avalanche(args: argparse.Namespace) -> None:
@@ -768,6 +837,24 @@ def run_avalanche_bootstrap(args: argparse.Namespace) -> None:
         ],
         summary_rows,
     )
+    write_metadata_json(
+        [args.samples_output, args.summary_output],
+        {
+            "experiment": "avalanche_bootstrap",
+            "rounds": args.rounds,
+            "seeds": args.seeds,
+            "samples_per_seed": args.samples,
+            "baseline": args.baseline,
+            "ci_method": "per_sample_percentile_bootstrap",
+            "bootstrap_iterations": args.bootstrap_iterations,
+            "bootstrap_seed": args.bootstrap_seed,
+        },
+        args,
+        {
+            "samples": args.samples_output.name,
+            "summary": args.summary_output.name,
+        },
+    )
 
 
 def run_avalanche_bits(args: argparse.Namespace) -> None:
@@ -835,6 +922,22 @@ def run_avalanche_bits(args: argparse.Namespace) -> None:
 
     write_rows_csv(args.bit_output, bit_fieldnames, bit_rows)
     write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
+    write_metadata_json(
+        [args.bit_output, args.summary_output],
+        {
+            "experiment": "avalanche_bits",
+            "rounds": args.rounds,
+            "seeds": args.seeds,
+            "samples_per_seed": args.samples,
+            "output_bytes": args.output_bytes,
+            "baseline": args.baseline,
+        },
+        args,
+        {
+            "bit_metrics": args.bit_output.name,
+            "summary": args.summary_output.name,
+        },
+    )
 
 
 def run_avalanche_vectors(args: argparse.Namespace) -> None:
@@ -901,6 +1004,20 @@ def run_avalanche_vectors(args: argparse.Namespace) -> None:
         print(",".join(str(row[field]) for field in summary_fieldnames))
 
     write_rows_csv(args.vector_output, fieldnames, rows)
+    write_metadata_json(
+        [args.vector_output],
+        {
+            "experiment": "avalanche_vectors",
+            "rounds": args.rounds,
+            "seeds": args.seeds,
+            "samples_per_seed": args.samples,
+            "input_bytes": args.input_bytes,
+            "output_bytes": args.output_bytes,
+            "fixed_input_bit": args.fixed_input_bit,
+        },
+        args,
+        {"vectors": args.vector_output.name},
+    )
 
 
 def run_avalanche_seed_bootstrap(args: argparse.Namespace) -> None:
@@ -982,6 +1099,21 @@ def run_avalanche_seed_bootstrap(args: argparse.Namespace) -> None:
         print(",".join(str(row[field]) for field in fieldnames))
 
     write_rows_csv(args.summary_output, fieldnames, summary_rows)
+    write_metadata_json(
+        [args.summary_output],
+        {
+            "experiment": "avalanche_seed_bootstrap",
+            "rounds": args.rounds,
+            "samples_input": str(args.samples_input),
+            "per_sample_metrics": str(args.per_sample_metrics) if args.per_sample_metrics else None,
+            "baseline": args.baseline,
+            "ci_method": "seed_mean_percentile_bootstrap",
+            "bootstrap_iterations": args.bootstrap_iterations,
+            "bootstrap_seed": args.bootstrap_seed,
+        },
+        args,
+        {"summary": args.summary_output.name},
+    )
 
 
 def run_avalanche_bit_ci(args: argparse.Namespace) -> None:
@@ -1075,6 +1207,24 @@ def run_avalanche_bit_ci(args: argparse.Namespace) -> None:
 
     write_rows_csv(args.bit_ci_output, fieldnames, rows)
     write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
+    write_metadata_json(
+        [args.bit_ci_output, args.summary_output],
+        {
+            "experiment": "avalanche_bit_ci",
+            "rounds": args.rounds,
+            "bit_input": str(args.bit_input),
+            "baseline": args.baseline,
+            "ci_method": "wilson_score",
+            "ci_level": args.ci_level,
+            "multiple_comparison": "Holm over output bits per round",
+            "alpha": args.alpha,
+        },
+        args,
+        {
+            "bit_ci_metrics": args.bit_ci_output.name,
+            "summary": args.summary_output.name,
+        },
+    )
 
 
 def run_avalanche_bit_seed_ci(args: argparse.Namespace) -> None:
@@ -1188,6 +1338,25 @@ def run_avalanche_bit_seed_ci(args: argparse.Namespace) -> None:
 
     write_rows_csv(args.seed_output, seed_fieldnames, seed_rows)
     write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
+    write_metadata_json(
+        [args.seed_output, args.summary_output],
+        {
+            "experiment": "avalanche_bit_seed_ci",
+            "rounds": args.rounds,
+            "output_bits": args.output_bits,
+            "bit_input": str(args.bit_input),
+            "pooled_ci_input": str(args.pooled_ci_input) if args.pooled_ci_input else None,
+            "baseline": args.baseline,
+            "ci_method": "seed_mean_percentile_bootstrap",
+            "bootstrap_iterations": args.bootstrap_iterations,
+            "bootstrap_seed": args.bootstrap_seed,
+        },
+        args,
+        {
+            "seed_metrics": args.seed_output.name,
+            "summary": args.summary_output.name,
+        },
+    )
 
 
 def run_low_order_stats(args: argparse.Namespace) -> None:
@@ -1295,6 +1464,23 @@ def run_low_order_stats(args: argparse.Namespace) -> None:
 
     write_rows_csv(args.summary_output, summary_fieldnames, summary_rows)
     write_rows_csv(args.block_output, block_fieldnames, block_rows)
+    write_metadata_json(
+        [args.summary_output, args.block_output],
+        {
+            "experiment": "low_order_stats",
+            "rounds": args.rounds,
+            "seeds": args.seeds,
+            "samples_per_seed": args.samples,
+            "input_bytes": args.input_bytes,
+            "output_bytes": args.output_bytes,
+            "block_size": args.block_size,
+        },
+        args,
+        {
+            "summary": args.summary_output.name,
+            "blocks": args.block_output.name,
+        },
+    )
 
 
 def run_distinguish(args: argparse.Namespace) -> None:
